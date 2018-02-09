@@ -157,28 +157,41 @@ namespace ElementCOMGUI
         /// <summary>
         /// Sets the given status label and name label text depending on the state of the serial port 'port' connection
         /// </summary>
-        /// <param name="port"></param>
-        /// <param name="statusLabel"></param>
-        /// <param name="nameLabel"></param>
+        /// <param name="port">
+        /// 'SerialPort' object that will be checked
+        /// </param>
+        /// <param name="statusLabel">
+        /// GUI label which displays the status of the connection
+        /// </param>
+        /// <param name="nameLabel">
+        /// GUI label which displays the name of the connected COM port
+        /// </param>
         private void UpdateCOMConnectionStatus(SerialPort port, Label statusLabel, Label nameLabel)
         {
+            // If port is open (connected)
             if (port.IsOpen)
             {
-                statusLabel.Text = "Connected";
-                nameLabel.Text = port.PortName;
+                statusLabel.Text = "Connected"; // Set connection status label text to 'Connected'
+                nameLabel.Text = port.PortName; // Set COM name label text to the name of the connected port
             }
             else
             {
-                statusLabel.Text = "Not Connected";
-                nameLabel.Text = "";
+                statusLabel.Text = "Not Connected"; // Set connection status label text to 'Not Connected'
+                nameLabel.Text = ""; // Hide the COM name label text
             }
         }
 
+        /// <summary>
+        /// Updates the main COM status and name labels
+        /// </summary>
         private void UpdateMainCOMConnectionStatus()
         {
             UpdateCOMConnectionStatus(MainCOMPort, MainCOMConnectionStatusLabel, MainCOMNameLabel);
         }
 
+        /// <summary>
+        /// Updates the log file COM status and name labels
+        /// </summary>
         private void UpdateLogFileCOMConnectionStatus()
         {
             UpdateCOMConnectionStatus(LogFileCOMPort, LogFileCOMPortConnectionStatusLabel, LogFileCOMNameLabel);
@@ -188,6 +201,10 @@ namespace ElementCOMGUI
 
         #region LOG_FILE_SAVE_DIALOG_FUNCTIONS
 
+        /// <summary>
+        /// Brings up the save file dialog for the log file. Returns the end state of the dialog (i.e. if it was cancelled)
+        /// </summary>
+        /// <returns></returns>
         private DialogResult SetLogFileSavePath()
         {
             LogFileSaveDialog.Filter = "Comma Separated Value File|*.csv";
