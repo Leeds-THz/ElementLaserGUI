@@ -65,7 +65,6 @@
             this.MainCOMPortSelector.Name = "MainCOMPortSelector";
             this.MainCOMPortSelector.Size = new System.Drawing.Size(132, 69);
             this.MainCOMPortSelector.TabIndex = 0;
-            this.MainCOMPortSelector.SelectedIndexChanged += new System.EventHandler(this.listBox1_SelectedIndexChanged);
             // 
             // COMOut
             // 
