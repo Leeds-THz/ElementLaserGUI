@@ -22,12 +22,20 @@ namespace ElementCOMGUI
             RefreshCOMSelector();
         }
 
-        private void SetLogFileSavePath()
+        private DialogResult SetLogFileSavePath()
         {
             LogFileSaveDialog.Filter = "Comma Separated Value File|*.csv";
             LogFileSaveDialog.Title = "Log File Save Location";
-            LogFileSaveDialog.ShowDialog();
+            var result = LogFileSaveDialog.ShowDialog();
+
+            if (result == DialogResult.Cancel)
+            {
+                LogFileSaveDialog.FileName = "";
+            }
+
             UpdateSaveLocationLabel();
+
+            return result;
         }
 
         private void UpdateCOMConnectionStatus(SerialPort port, Label statusLabel, Label nameLabel)
@@ -184,12 +192,28 @@ namespace ElementCOMGUI
             {
                 if (CommandComboBox.Text == "GETLOG=?")
                 {
-                    SetLogFileSavePath();
+                    if (!LogFileCOMPort.IsOpen)
+                    {
+                        SetErrorLabelMessage("Log file COM port not connected. Please press 'Auto-Connect'.");
+                        return;
+                    }
+
+                    if (SetLogFileSavePath() == DialogResult.Cancel)
+                    {
+                        SetErrorLabelMessage("Save file location not chosen.");
+                        return;
+                    }
+
                     StartLogFileRecording();
                 }
 
                 MainCOMPort.Write(CommandComboBox.Text + "\r");
             }
+        }
+
+        private void SetErrorLabelMessage(string message)
+        {
+            ErrorLabel.Text = "Error: " + message;
         }
 
         private void ClearButton_Click(object sender, EventArgs e)
@@ -266,7 +290,14 @@ namespace ElementCOMGUI
 
         private void UpdateSaveLocationLabel()
         {
-            LogFileSavePathLabel.Text = "Log file will be saved to: '" + LogFileSaveDialog.FileName + "'";
+            if (LogFileSaveDialog.FileName != "")
+            {
+                LogFileSavePathLabel.Text = "Log file will be saved to: '" + LogFileSaveDialog.FileName + "'";
+            }
+            else
+            {
+                LogFileSavePathLabel.Text = "";
+            }
         }
 
         
