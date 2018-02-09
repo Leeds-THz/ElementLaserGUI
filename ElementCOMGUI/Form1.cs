@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Diagnostics;
 using System.Collections.Generic;
 using System.IO.Ports;
 using System.Windows.Forms;
@@ -9,35 +8,158 @@ namespace ElementCOMGUI
 {
     public partial class Form1 : Form
     {
-        private string[] COMList;
-        private static List<string> MainCOMDataBuffer = new List<string>();
-        private static List<string> TempCOMDataBuffer = new List<string>();
-        private static List<string> LogFileCOMDataBuffer = new List<string>();
-        private bool logFileWriteFlag = false;
-        //private Stopwatch LogFileStopwatch = new Stopwatch();
+        #region VARIABLES
 
+        private string[] COMList; // Array to store names of all COM ports discovered
+        private static List<string> MainCOMDataBuffer = new List<string>(); // List to store data recieved from the main COM connection
+        private static List<string> TempCOMDataBuffer = new List<string>(); // List to store data recieved from the temp COM connection
+        //private static List<string> LogFileCOMDataBuffer = new List<string>(); // List to store data recieved from the log file COM connection
+        private bool logFileWriteFlag = false; // Flag set high when log file is being written to
+
+        #endregion
+
+        #region CONSTRUCTOR
+
+        /// <summary>
+        /// Form Constructor
+        /// </summary>
         public Form1()
         {
-            InitializeComponent();
-            RefreshCOMSelector();
+            InitializeComponent(); // Initialised the application
+            RefreshCOMSelector(); // Get the discoverable COM ports on start-up
         }
 
-        private DialogResult SetLogFileSavePath()
+        #endregion
+
+        #region COM_CONNECTION_FUNCTIONS
+
+        /// <summary>
+        /// Retrieves the discoverable COM ports, storing the names to 'COMList'
+        /// </summary>
+        private void RefreshCOM()
         {
-            LogFileSaveDialog.Filter = "Comma Separated Value File|*.csv";
-            LogFileSaveDialog.Title = "Log File Save Location";
-            var result = LogFileSaveDialog.ShowDialog();
+            COMList = SerialPort.GetPortNames(); // Acquire string array of the names of all discoverable COM ports
 
-            if (result == DialogResult.Cancel)
-            {
-                LogFileSaveDialog.FileName = "";
-            }
-
-            UpdateSaveLocationLabel();
-
-            return result;
+            Array.Sort(COMList); // Sort the list
         }
 
+        /// <summary>
+        /// Connects 'SerialPort' object 'port' to the port with name 'portName' if possible, using a baud rate of 'baudRate'.
+        /// </summary>
+        /// <param name="port">
+        /// SerialPort object to be opened
+        /// </param>
+        /// <param name="portName">
+        /// Name of the port to be connected to
+        /// </param>
+        /// <param name="baudRate">
+        /// Baud rate of the port (Default value = 115200)
+        /// </param>
+        private void ConnectCOM(SerialPort port, string portName, int baudRate = 115200)
+        {
+            port.Close(); // Make sure port is closed
+
+            port.BaudRate = baudRate; // Set the baud rate
+
+            try
+            {
+                port.PortName = portName; // Set which port to connect to
+
+                port.Open(); // Open a connection to the port
+
+                // Remove data from input/output buffers
+                port.DiscardInBuffer();
+                port.DiscardOutBuffer();
+            }
+            catch { }
+        }
+
+        /// <summary>
+        /// Closes the connection of serial port 'port'
+        /// </summary>
+        /// <param name="port">
+        /// Serial port to be closed
+        /// </param>
+        private void DisconnectCOM(SerialPort port)
+        {
+            port.Close(); // Close connection of port
+        }
+
+        /// <summary>
+        /// Event handler to store serial data recieved to be stored to a buffer list
+        /// </summary>
+        /// <param name="dataBufferList">
+        /// List where the recieved data will be stored
+        /// </param>
+        /// <param name="sender">
+        /// Object which raised the event
+        /// </param>
+        /// <param name="e">
+        /// Serial data recieved event
+        /// </param>
+        private void COMDataRecievedHandler(List<string> dataBufferList, object sender, SerialDataReceivedEventArgs e)
+        {
+            SerialPort port = (SerialPort)sender; // Get the 'SerialPort' object which raised the event
+            string data = port.ReadExisting(); // Read all existing data in a string
+
+            dataBufferList.Add(data); // Store data to the buffer
+        }
+
+        /// <summary>
+        /// Event handler used by the main com port to buffer recieved data to 'MainCOMDataBuffer'
+        /// </summary>
+        /// <param name="sender">
+        /// Object which raised the event
+        /// </param>
+        /// <param name="e">
+        /// Serial data recieved event
+        /// </param>
+        private void MainCOMDataRecievedHandler(object sender, SerialDataReceivedEventArgs e)
+        {
+            COMDataRecievedHandler(MainCOMDataBuffer, sender, e);
+        }
+
+        /// <summary>
+        /// Event handler used by the temp com port to buffer recieved data to 'TempCOMDataBuffer'
+        /// </summary>
+        /// <param name="sender">
+        /// Object which raised the event
+        /// </param>
+        /// <param name="e">
+        /// Serial data recieved event
+        /// </param>
+        private void TempCOMDataRecievedHandler(object sender, SerialDataReceivedEventArgs e)
+        {
+            COMDataRecievedHandler(TempCOMDataBuffer, sender, e);
+        }
+
+        /// <summary>
+        /// Event handler used by the log file com port to write recieved data to the log file 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void LogFileCOMDataRecievedHandler(object sender, SerialDataReceivedEventArgs e)
+        {
+            // If log file writing is enabled
+            if (logFileWriteFlag)
+            {
+                SerialPort port = (SerialPort)sender; // Get the 'SerialPort' object which raised the event
+                string data = port.ReadExisting(); // Read all existing data into a string
+
+                // Append the data to the file 'LogFileSaveDialog.FileName'
+                using (StreamWriter sw = File.AppendText(LogFileSaveDialog.FileName))
+                {
+                    sw.Write(data);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Sets the given status label and name label text depending on the state of the serial port 'port' connection
+        /// </summary>
+        /// <param name="port"></param>
+        /// <param name="statusLabel"></param>
+        /// <param name="nameLabel"></param>
         private void UpdateCOMConnectionStatus(SerialPort port, Label statusLabel, Label nameLabel)
         {
             if (port.IsOpen)
@@ -62,102 +184,39 @@ namespace ElementCOMGUI
             UpdateCOMConnectionStatus(LogFileCOMPort, LogFileCOMPortConnectionStatusLabel, LogFileCOMNameLabel);
         }
 
-        private void RefreshCOM()
+        #endregion
+
+        #region LOG_FILE_SAVE_DIALOG_FUNCTIONS
+
+        private DialogResult SetLogFileSavePath()
         {
-            COMList = SerialPort.GetPortNames();
+            LogFileSaveDialog.Filter = "Comma Separated Value File|*.csv";
+            LogFileSaveDialog.Title = "Log File Save Location";
+            var result = LogFileSaveDialog.ShowDialog();
 
-            // Sort the list
-            Array.Sort(COMList);
-        }
-
-        private void RefreshCOMSelector()
-        {
-            // When refresh button clicked, dlete list of COM connections and create a new one
-
-            RefreshCOM();
-
-            MainCOMPortSelector.Items.Clear();
-
-            foreach (var port in COMList)
+            if (result == DialogResult.Cancel)
             {
-                MainCOMPortSelector.Items.Add(port);
+                LogFileSaveDialog.FileName = "";
             }
+
+            UpdateSaveLocationLabel();
+
+            return result;
         }
 
-        private void ConnectCOM(SerialPort port, string portName)
+        private void StartLogFileRecording()
         {
-            // Make sure port is closed
-            port.Close();
-
-            port.BaudRate = 115200;
-
-            try
-            {
-                // Set which port to connect to
-                port.PortName = portName;
-
-                // ELEMENT SPECIFIC SETTINGS HERE, REMOVE TO DEBUG ON BOARD
-                //port.NewLine = "\r";
-
-
-                // Open a connection to the port
-            
-                port.Open();
-                // Remove data from input/output buffers
-                port.DiscardInBuffer();
-                port.DiscardOutBuffer();
-            }
-            catch { }
+            logFileWriteFlag = true;
         }
 
-        private void DisconnectCOM(SerialPort port)
+        private void StopLogFileRecording()
         {
-            port.Close();
+            logFileWriteFlag = false;
         }
 
-        private void COMDataRecievedHandler(List<string> dataBufferList, object sender, SerialDataReceivedEventArgs e)
-        {
-            SerialPort port = (SerialPort)sender;
-            string data = port.ReadExisting(); // Read all existing data in the serial buffer
-            //string data = port.ReadLine(); // Read all existing data in the serial buffer
+        #endregion
 
-            dataBufferList.Add(data); // Store data to the textbox buffer
-        }
-
-        private void MainCOMDataRecievedHandler(object sender, SerialDataReceivedEventArgs e)
-        {
-            COMDataRecievedHandler(MainCOMDataBuffer, sender, e);
-        }
-
-        private void TempCOMDataRecievedHandler(object sender, SerialDataReceivedEventArgs e)
-        {
-            COMDataRecievedHandler(TempCOMDataBuffer, sender, e);
-        }
-
-        private void LogFileCOMDataRecievedHandler(object sender, SerialDataReceivedEventArgs e)
-        {
-            if (logFileWriteFlag == true)
-            {
-                //COMDataRecievedHandler(LogFileCOMDataBuffer, sender, e);
-                SerialPort port = (SerialPort)sender;
-                string data = port.ReadExisting(); // Read all existing data in the serial buffer
-
-                using (StreamWriter sw = File.AppendText(LogFileSaveDialog.FileName))
-                {
-                    sw.Write(data);
-                }
-            }
-        }
-
-        private void COMRefreshButton_Click(object sender, EventArgs e)
-        {
-            RefreshCOMSelector();
-        }
-
-        private void MainCOMConnectButton_Click(object sender, EventArgs e)
-        {
-            ConnectCOM(MainCOMPort, MainCOMPortSelector.Text);
-        }
+        #region GUI_INTERFACE_FUNCTIONS
 
         private void Update_Tick(object sender, EventArgs e)
         {
@@ -186,6 +245,34 @@ namespace ElementCOMGUI
             }
         }
 
+        private void RefreshCOMSelector()
+        {
+            // When refresh button clicked, delete list of COM connections and create a new one
+
+            RefreshCOM();
+
+            MainCOMPortSelector.Items.Clear();
+
+            foreach (var port in COMList)
+            {
+                MainCOMPortSelector.Items.Add(port);
+            }
+        }
+
+
+
+        private void COMRefreshButton_Click(object sender, EventArgs e)
+        {
+            RefreshCOMSelector();
+        }
+
+        private void MainCOMConnectButton_Click(object sender, EventArgs e)
+        {
+            ConnectCOM(MainCOMPort, MainCOMPortSelector.Text);
+        }
+
+
+
         private void CommandButton_Click(object sender, EventArgs e)
         {
             if (MainCOMPort.IsOpen)
@@ -196,12 +283,14 @@ namespace ElementCOMGUI
                 {
                     if (!LogFileCOMPort.IsOpen)
                     {
+                        StopLogFileRecording();
                         SetErrorLabelMessage("Log file COM port not connected. Please press 'Auto-Connect'");
                         return;
                     }
 
                     if (SetLogFileSavePath() == DialogResult.Cancel)
                     {
+                        StopLogFileRecording();
                         SetErrorLabelMessage("Save file location not chosen");
                         return;
                     }
@@ -312,13 +401,7 @@ namespace ElementCOMGUI
             }
         }
 
-        
-        private void StartLogFileRecording()
-        {
-            logFileWriteFlag = true;
-        }
-       
-
+        #endregion
 
     }
 }
