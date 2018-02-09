@@ -196,13 +196,13 @@ namespace ElementCOMGUI
                 {
                     if (!LogFileCOMPort.IsOpen)
                     {
-                        SetErrorLabelMessage("Log file COM port not connected. Please press 'Auto-Connect'.");
+                        SetErrorLabelMessage("Log file COM port not connected. Please press 'Auto-Connect'");
                         return;
                     }
 
                     if (SetLogFileSavePath() == DialogResult.Cancel)
                     {
-                        SetErrorLabelMessage("Save file location not chosen.");
+                        SetErrorLabelMessage("Save file location not chosen");
                         return;
                     }
 
@@ -231,8 +231,8 @@ namespace ElementCOMGUI
 
         private void LogFileCOMPortAutoConnect_Click(object sender, EventArgs e)
         {
-            // Maybe add a progress bar + execute on separate thread?
-
+            // Maybe execute on separate thread?
+            ClearErrorLabelMessage();
             TempCOMDataBuffer.Clear();
             LogFileCOMPort.Close();
             RefreshCOM();
@@ -280,6 +280,11 @@ namespace ElementCOMGUI
                 {
                     AutoConnectProgressBar.Value++;
                 }
+            }
+
+            if (!LogFileCOMPort.IsOpen)
+            {
+                SetErrorLabelMessage("Could not find the log file COM port");
             }
 
             AutoConnectProgressBar.Visible = false;
