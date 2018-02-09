@@ -190,6 +190,8 @@ namespace ElementCOMGUI
         {
             if (MainCOMPort.IsOpen)
             {
+                ClearErrorLabelMessage();
+
                 if (CommandComboBox.Text == "GETLOG=?")
                 {
                     if (!LogFileCOMPort.IsOpen)
@@ -209,6 +211,11 @@ namespace ElementCOMGUI
 
                 MainCOMPort.Write(CommandComboBox.Text + "\r");
             }
+        }
+
+        private void ClearErrorLabelMessage()
+        {
+            ErrorLabel.Text = "";
         }
 
         private void SetErrorLabelMessage(string message)
