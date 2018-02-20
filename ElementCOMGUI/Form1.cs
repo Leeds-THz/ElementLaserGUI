@@ -95,7 +95,7 @@ namespace ElementCOMGUI
         /// Object which raised the event
         /// </param>
         /// <param name="e">
-        /// Serial data recieved event
+        /// Event which was raised
         /// </param>
         private void COMDataRecievedHandler(List<string> dataBufferList, object sender, SerialDataReceivedEventArgs e)
         {
@@ -112,7 +112,7 @@ namespace ElementCOMGUI
         /// Object which raised the event
         /// </param>
         /// <param name="e">
-        /// Serial data recieved event
+        /// Event which was raised
         /// </param>
         private void MainCOMDataRecievedHandler(object sender, SerialDataReceivedEventArgs e)
         {
@@ -126,7 +126,7 @@ namespace ElementCOMGUI
         /// Object which raised the event
         /// </param>
         /// <param name="e">
-        /// Serial data recieved event
+        /// Event which was raised
         /// </param>
         private void TempCOMDataRecievedHandler(object sender, SerialDataReceivedEventArgs e)
         {
@@ -136,8 +136,12 @@ namespace ElementCOMGUI
         /// <summary>
         /// Event handler used by the log file com port to write recieved data to the log file 
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+        /// <param name="sender">
+        /// Object which raised the event
+        /// </param>
+        /// <param name="e">
+        /// Event which was raised
+        /// </param>
         private void LogFileCOMDataRecievedHandler(object sender, SerialDataReceivedEventArgs e)
         {
             // If log file writing is enabled
@@ -207,25 +211,32 @@ namespace ElementCOMGUI
         /// <returns></returns>
         private DialogResult SetLogFileSavePath()
         {
-            LogFileSaveDialog.Filter = "Comma Separated Value File|*.csv";
-            LogFileSaveDialog.Title = "Log File Save Location";
-            var result = LogFileSaveDialog.ShowDialog();
+            LogFileSaveDialog.Filter = "CSV File|*.csv"; // Set the save file delimiter filter
+            LogFileSaveDialog.Title = "Log File Save Location"; // Set the title of the save dialog window
+            var result = LogFileSaveDialog.ShowDialog(); // Show the save file dialog and store the result of the dialog
 
+            // If the save file dialog result is a cancel
             if (result == DialogResult.Cancel)
             {
-                LogFileSaveDialog.FileName = "";
+                LogFileSaveDialog.FileName = ""; // Set the save file path string to an empty string
             }
 
-            UpdateSaveLocationLabel();
+            UpdateSaveLocationLabel(); // Update the save location label
 
-            return result;
+            return result; // Return the result of the save dialog
         }
 
+        /// <summary>
+        /// Sets 'logFileWriteFlag' to true
+        /// </summary>
         private void StartLogFileRecording()
         {
             logFileWriteFlag = true;
         }
 
+        /// <summary>
+        /// Sets 'logFileWriteFlag' to false
+        /// </summary>
         private void StopLogFileRecording()
         {
             logFileWriteFlag = false;
@@ -235,10 +246,19 @@ namespace ElementCOMGUI
 
         #region GUI_INTERFACE_FUNCTIONS
 
+        /// <summary>
+        /// Function called on every update call of the 'Update' timer
+        /// </summary>
+        /// <param name="sender">
+        /// Object which raised the event
+        /// </param>
+        /// <param name="e">
+        /// Event which was raised
+        /// </param>
         private void Update_Tick(object sender, EventArgs e)
         {
-            UpdateMainCOMConnectionStatus();
-            UpdateLogFileCOMConnectionStatus();
+            UpdateMainCOMConnectionStatus(); // Check if the main COM port is connected
+            UpdateLogFileCOMConnectionStatus(); // Check if log file COM port is connected
 
             // Check if there is data in the textbox buffer
             if (MainCOMDataBuffer.Count > 0)
@@ -262,6 +282,9 @@ namespace ElementCOMGUI
             }
         }
 
+        /// <summary>
+        /// Updates the list of available COMs and displays the list on the main COM port selector
+        /// </summary>
         private void RefreshCOMSelector()
         {
             // When refresh button clicked, delete list of COM connections and create a new one
@@ -277,75 +300,143 @@ namespace ElementCOMGUI
         }
 
 
-
+        /// <summary>
+        /// Function to be called when the COM refresh button is clicked
+        /// </summary>
+        /// <param name="sender">
+        /// Object which raised the event
+        /// </param>
+        /// <param name="e">
+        /// Event which was raised
+        /// </param>
         private void COMRefreshButton_Click(object sender, EventArgs e)
         {
             RefreshCOMSelector();
         }
 
+        /// <summary>
+        /// Function to be called when the main COM connection button is pressed
+        /// </summary>
+        /// <param name="sender">
+        /// Object which raised the event
+        /// </param>
+        /// <param name="e">
+        /// Event which was raised
+        /// </param>
         private void MainCOMConnectButton_Click(object sender, EventArgs e)
         {
             ConnectCOM(MainCOMPort, MainCOMPortSelector.Text);
         }
 
-
-
+        /// <summary>
+        /// Function to be called when the send command button is clicked
+        /// </summary>
+        /// <param name="sender">
+        /// Object which raised the event
+        /// </param>
+        /// <param name="e">
+        /// Event which was raised
+        /// </param>
         private void CommandButton_Click(object sender, EventArgs e)
         {
+            // Check if the main COM port is connected
             if (MainCOMPort.IsOpen)
             {
+                // Clear any error messages
                 ClearErrorLabelMessage();
 
+                // If the "GETLOG=?" command is sent
                 if (CommandComboBox.Text == "GETLOG=?")
                 {
+                    // If the log file COM port is not connected
                     if (!LogFileCOMPort.IsOpen)
                     {
+                        // Stop the log file from recording
                         StopLogFileRecording();
+                        // Display error message about log file COM port not being connected
                         SetErrorLabelMessage("Log file COM port not connected. Please press 'Auto-Connect'");
                         return;
                     }
 
+                    // Bring up the save file dialog and if the result of the dialog is a failure
                     if (SetLogFileSavePath() == DialogResult.Cancel)
                     {
+                        // Stop the log file from recording
                         StopLogFileRecording();
+                        // Display error message about the save location not being chosen
                         SetErrorLabelMessage("Save file location not chosen");
                         return;
                     }
 
+                    // Begin recording the log file COM input to the log file
                     StartLogFileRecording();
                 }
 
+                // Send the command over the main COM port
                 MainCOMPort.Write(CommandComboBox.Text + "\r");
             }
         }
 
+        /// <summary>
+        /// Sets the error message text to be blank
+        /// </summary>
         private void ClearErrorLabelMessage()
         {
             ErrorLabel.Text = "";
         }
 
+        /// <summary>
+        /// Display the given error message on the error message label. Displays in the format of "Error: 'message'"
+        /// </summary>
+        /// <param name="message">
+        /// Error message to be displayed
+        /// </param>
         private void SetErrorLabelMessage(string message)
         {
             ErrorLabel.Text = "Error: " + message;
         }
 
+        /// <summary>
+        /// Function called when the clear button is clicked
+        /// </summary>
+        /// <param name="sender">
+        /// Object which raised the event
+        /// </param>
+        /// <param name="e">
+        /// Event which was raised
+        /// </param>
         private void ClearButton_Click(object sender, EventArgs e)
         {
             COMOut.Clear();
         }
 
-
+        /// <summary>
+        /// Function called when the log file auto-connect button is clicked. Iterates through all visible COM ports in an attempt to find the port the log file is sort over
+        /// </summary>
+        /// <param name="sender">
+        /// Object which raised the event
+        /// </param>
+        /// <param name="e">
+        /// Event which was raised
+        /// </param>
         private void LogFileCOMPortAutoConnect_Click(object sender, EventArgs e)
         {
-            // Maybe execute on separate thread?
+            // Clear any error messages
             ClearErrorLabelMessage();
+
+            // Clear the temp COM buffer
             TempCOMDataBuffer.Clear();
+
+            // Close any current connections to the log file COM port
             LogFileCOMPort.Close();
+
+            // Refresh the list of visible COM ports
             RefreshCOM();
 
-            AutoConnectProgressBar.Value = 0;
-            AutoConnectProgressBar.Maximum = COMList.Length;
-            AutoConnectProgressBar.Visible = true;
+            // Initilise the auto-connect progress bar
+            AutoConnectProgressBar.Value = 0; // Set initial bar value to 0
+            AutoConnectProgressBar.Maximum = COMList.Length; // Set the max length of the auto-connect bar to be the number of visible COM ports
+            AutoConnectProgressBar.Visible = true; // Set the progress bar to be visible
 
             // Iterate through all COM ports
             foreach (var com in COMList)
@@ -353,6 +444,7 @@ namespace ElementCOMGUI
                 // Temporarily connect to the COM port
                 ConnectCOM(TempCOMPort, com);
 
+                // If the temporary COM port connected correctly
                 if (TempCOMPort.IsOpen)
                 {
                     // Send empty data
@@ -361,6 +453,8 @@ namespace ElementCOMGUI
                     int whileCounter = 0;
 
                     // Read recieved data
+
+                    // Delay for a bit to allow for data to be sent and recieved
                     while (TempCOMDataBuffer.Count == 0 && whileCounter < Int32.MaxValue / 2)
                     {
                         whileCounter++;
@@ -374,6 +468,7 @@ namespace ElementCOMGUI
                     {
                         // Connect the LogFileCOM port to the port
                         ConnectCOM(LogFileCOMPort, com);
+                        // Update the auto-connect progress bar
                         AutoConnectProgressBar.Value = AutoConnectProgressBar.Maximum;
                         break;
                     }
@@ -382,30 +477,48 @@ namespace ElementCOMGUI
                     TempCOMDataBuffer.Clear();
                 }
 
+                // If the auto-connect progress bar's current value is less than its max value
                 if (AutoConnectProgressBar.Value < AutoConnectProgressBar.Maximum)
                 {
+                    // Increase the auto-connect progress value
                     AutoConnectProgressBar.Value++;
                 }
             }
 
+            // If a connection to the log file COM port was unsuccessful
             if (!LogFileCOMPort.IsOpen)
             {
+                // Display error message about the log file COM port not being found
                 SetErrorLabelMessage("Could not find the log file COM port");
             }
 
+            // Hide the auto-connect progress bar
             AutoConnectProgressBar.Visible = false;
         }
 
+        /// <summary>
+        /// Function to be called when the main COM disconnect button is clicked
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void MainDisconnectButton_Click(object sender, EventArgs e)
         {
             DisconnectCOM(MainCOMPort);
         }
 
+        /// <summary>
+        ///  Function to be called when the log file COM disconnect button is clicked
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void LogDisconnectButton_Click(object sender, EventArgs e)
         {
             DisconnectCOM(LogFileCOMPort);
         }
 
+        /// <summary>
+        /// Updates the text in the save location label. Displays the path of the current save file location if the save dialog worked and displays nothing otherwise
+        /// </summary>
         private void UpdateSaveLocationLabel()
         {
             if (LogFileSaveDialog.FileName != "")
