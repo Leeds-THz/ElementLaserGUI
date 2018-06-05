@@ -15,6 +15,8 @@ namespace ElementCOMGUI
         private static List<string> TempCOMDataBuffer = new List<string>(); // List to store data recieved from the temp COM connection
         //private static List<string> LogFileCOMDataBuffer = new List<string>(); // List to store data recieved from the log file COM connection
         private bool logFileWriteFlag = false; // Flag set high when log file is being written to
+        private bool autoTurnOnSentFlag = false; // Flag set high when auto turn on has been requested
+        private bool supressAutoTurnOnCheckBoxMessage = false; // Flag set high when the program is altering the state of the auto turn on check box
 
         #endregion
 
@@ -280,6 +282,10 @@ namespace ElementCOMGUI
                 // Remove the most recent data from the buffer
                 MainCOMDataBuffer.RemoveAt(0);
             }
+
+            AutoTurnOn();
+
+
         }
 
         /// <summary>
@@ -537,5 +543,81 @@ namespace ElementCOMGUI
 
         #endregion
 
+
+        #region AUTO_TURN_ON_FUNCTIONS
+
+        private void AutoTurnOnTimePicker_ValueChanged(object sender, EventArgs e)
+        {
+            //MessageBox.Show(AutoTurnOnTimePicker.Value.TimeOfDay.ToString());
+            //AutoTurnOnTimePicker.Value.Second = 0;
+        }
+
+        private void AutoTurnOnCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            if (!supressAutoTurnOnCheckBoxMessage)
+            {
+                if (AutoTurnOnCheckBox.Checked)
+                {
+                    MessageBox.Show("The Element will automatically be turned on at " + AutoTurnOnTimePicker.Value.ToShortTimeString());
+                    // MessageBox.Show(AutoTurnOnTimePicker.Value.TimeOfDay.ToString());
+
+                }
+                else
+                {
+                    MessageBox.Show("The Element will not automatically be turned on");
+                }
+            }
+            else
+            {
+                supressAutoTurnOnCheckBoxMessage = false;
+            }
+
+            autoTurnOnSentFlag = false;
+        }
+
+        private bool AutoTurnOnChecker()
+        {
+            if (AutoTurnOnCheckBox.Checked)
+            {
+                var curTime = DateTime.Now.ToShortTimeString();
+                var autoTurnOnTime = AutoTurnOnTimePicker.Value.ToShortTimeString();
+
+                if (curTime == autoTurnOnTime)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private void SendTurnOnCommand()
+        {
+            if (MainCOMPort.IsOpen)
+            {
+                // Send the command over the main COM port
+                MainCOMPort.Write("STARTLSR=1\r");
+            }
+        }
+
+        private void AutoTurnOn()
+        {
+            var turnOn = AutoTurnOnChecker();
+
+            if (!autoTurnOnSentFlag && turnOn)
+            {
+                SendTurnOnCommand();
+
+                autoTurnOnSentFlag = true;
+
+                supressAutoTurnOnCheckBoxMessage = true;
+
+                AutoTurnOnCheckBox.Checked = false;
+
+                MessageBox.Show("The Element was automatically turned on at " + DateTime.Now.ToShortTimeString());
+            }
+        }
+
+        #endregion
     }
 }
