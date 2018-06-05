@@ -375,6 +375,10 @@ namespace ElementCOMGUI
                 // Send the command over the main COM port
                 MainCOMPort.Write(CommandComboBox.Text + "\r");
             }
+            else
+            {
+                SetErrorLabelMessage("Main COM port not connected");
+            }
         }
 
         /// <summary>

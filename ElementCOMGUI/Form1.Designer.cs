@@ -80,6 +80,10 @@
             // 
             this.MainCOMPort.DataReceived += new System.IO.Ports.SerialDataReceivedEventHandler(this.MainCOMDataRecievedHandler);
             // 
+            // LogFileCOMPort
+            // 
+            this.LogFileCOMPort.DataReceived += new System.IO.Ports.SerialDataReceivedEventHandler(this.LogFileCOMDataRecievedHandler);
+            // 
             // MainConnectButton
             // 
             this.MainConnectButton.Location = new System.Drawing.Point(148, 18);
