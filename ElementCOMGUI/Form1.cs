@@ -3,6 +3,7 @@ using System.IO;
 using System.Collections.Generic;
 using System.IO.Ports;
 using System.Windows.Forms;
+using System.Text.RegularExpressions;
 
 namespace ElementCOMGUI
 {
@@ -543,6 +544,23 @@ namespace ElementCOMGUI
 
         #endregion
 
+        #region MESSAGE_PARSING_FUNCTIONS
+
+        #region LOGFILE_TIME_ESTIMATOR
+
+        int LogfileTransferSecondsRemaining(string logLine)
+        {
+            // Logline in format "LOGFILE N BYTES REMAINING"
+            string pattern = @"\d+";
+            Match match = Regex.Match(logLine, pattern);
+
+            return 0;
+
+        }
+
+        #endregion
+
+        #endregion
 
         #region AUTO_TURN_ON_FUNCTIONS
 
