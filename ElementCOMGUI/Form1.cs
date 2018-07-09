@@ -284,9 +284,9 @@ namespace ElementCOMGUI
                 MainCOMDataBuffer.RemoveAt(0);
             }
 
+            DisplayLogFileTimeRemaining();
+
             AutoTurnOn();
-
-
         }
 
         /// <summary>
@@ -546,16 +546,79 @@ namespace ElementCOMGUI
 
         #region MESSAGE_PARSING_FUNCTIONS
 
+        string GetTextBoxLastLine(TextBox textBox)
+        {
+            var lines = TakeLastLines(textBox.Text, 2);
+
+            if (lines.Count == 0)
+            {
+                return "";
+            }
+            else
+            {
+                return lines[0];
+            }
+        }
+
+        /// <summary>
+        /// Retrieves the last n lines from a multiline string. Code taken from "https://stackoverflow.com/questions/11942885/take-the-last-n-lines-of-a-string-c-sharp"
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="count"></param>
+        /// <returns></returns>
+        private static List<string> TakeLastLines(string text, int count)
+        {
+            List<string> lines = new List<string>();
+            Match match = Regex.Match(text, "^.*$", RegexOptions.Multiline | RegexOptions.RightToLeft);
+
+            while (match.Success && lines.Count < count)
+            {
+                lines.Insert(0, match.Value);
+                match = match.NextMatch();
+            }
+
+            return lines;
+        }
+
         #region LOGFILE_TIME_ESTIMATOR
 
         int LogfileTransferSecondsRemaining(string logLine)
         {
             // Logline in format "LOGFILE N BYTES REMAINING"
-            string pattern = @"\d+";
+            string pattern = @"\d+(?= BYTES REMAINING)";
             Match match = Regex.Match(logLine, pattern);
 
-            return 0;
+            //int bytesRemaining = 0;
+            int secondsRemaining = 0;
 
+            if (match.Captures.Count == 1 && int.TryParse(match.Value, out int bytesRemaining))
+            {
+                secondsRemaining = bytesRemaining / 10000;
+            }
+
+
+            return secondsRemaining;
+        }
+
+        
+
+        void DisplayLogFileTimeRemaining()
+        {
+            // Read last line of COMOUT
+            string lastLine = GetTextBoxLastLine(COMOut);
+
+            int secondsRemaining = LogfileTransferSecondsRemaining(lastLine);
+
+            if (secondsRemaining == 0)
+            {
+                LogfileTransferTimeLabel.Hide();
+            }
+            else
+            {
+                LogfileTransferTimeLabel.Show();
+
+                LogfileTransferTimeLabel.Text = String.Format("File Transfer Time Remaining:\n{0} Second(s)", secondsRemaining);
+            }
         }
 
         #endregion

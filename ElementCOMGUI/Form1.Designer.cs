@@ -40,12 +40,14 @@
             this.CommandComboBox = new System.Windows.Forms.ComboBox();
             this.ClearButton = new System.Windows.Forms.Button();
             this.LogFileCOMGroupBox = new System.Windows.Forms.GroupBox();
+            this.LogfileTransferTimeLabel = new System.Windows.Forms.Label();
             this.AutoConnectProgressBar = new System.Windows.Forms.ProgressBar();
             this.LogDisconnectButton = new System.Windows.Forms.Button();
             this.LogFileCOMNameLabel = new System.Windows.Forms.Label();
             this.LogFileCOMPortConnectionStatusLabel = new System.Windows.Forms.Label();
             this.LogAutoConnectButton = new System.Windows.Forms.Button();
             this.MainCOMGroupBox = new System.Windows.Forms.GroupBox();
+            this.AutoTurnOnCheckBox = new System.Windows.Forms.CheckBox();
             this.AutoTurnOnTimePicker = new System.Windows.Forms.DateTimePicker();
             this.MainDisconnectButton = new System.Windows.Forms.Button();
             this.MainCOMNameLabel = new System.Windows.Forms.Label();
@@ -55,7 +57,6 @@
             this.LogFileSaveDialog = new System.Windows.Forms.SaveFileDialog();
             this.LogFileSavePathLabel = new System.Windows.Forms.Label();
             this.ErrorLabel = new System.Windows.Forms.Label();
-            this.AutoTurnOnCheckBox = new System.Windows.Forms.CheckBox();
             this.LogFileCOMGroupBox.SuspendLayout();
             this.MainCOMGroupBox.SuspendLayout();
             this.SuspendLayout();
@@ -150,6 +151,7 @@
             // 
             // LogFileCOMGroupBox
             // 
+            this.LogFileCOMGroupBox.Controls.Add(this.LogfileTransferTimeLabel);
             this.LogFileCOMGroupBox.Controls.Add(this.AutoConnectProgressBar);
             this.LogFileCOMGroupBox.Controls.Add(this.LogDisconnectButton);
             this.LogFileCOMGroupBox.Controls.Add(this.LogFileCOMNameLabel);
@@ -161,6 +163,16 @@
             this.LogFileCOMGroupBox.TabIndex = 9;
             this.LogFileCOMGroupBox.TabStop = false;
             this.LogFileCOMGroupBox.Text = "Log File COM Port Panel";
+            // 
+            // LogfileTransferTimeLabel
+            // 
+            this.LogfileTransferTimeLabel.AutoSize = true;
+            this.LogfileTransferTimeLabel.ForeColor = System.Drawing.SystemColors.ControlDark;
+            this.LogfileTransferTimeLabel.Location = new System.Drawing.Point(3, 89);
+            this.LogfileTransferTimeLabel.Name = "LogfileTransferTimeLabel";
+            this.LogfileTransferTimeLabel.Size = new System.Drawing.Size(147, 26);
+            this.LogfileTransferTimeLabel.TabIndex = 13;
+            this.LogfileTransferTimeLabel.Text = "File Transfer Time Remaining:\r\n0 Second(s)";
             // 
             // AutoConnectProgressBar
             // 
@@ -228,6 +240,17 @@
             this.MainCOMGroupBox.TabIndex = 10;
             this.MainCOMGroupBox.TabStop = false;
             this.MainCOMGroupBox.Text = "Main COM Port Panel";
+            // 
+            // AutoTurnOnCheckBox
+            // 
+            this.AutoTurnOnCheckBox.AutoSize = true;
+            this.AutoTurnOnCheckBox.Location = new System.Drawing.Point(8, 168);
+            this.AutoTurnOnCheckBox.Name = "AutoTurnOnCheckBox";
+            this.AutoTurnOnCheckBox.Size = new System.Drawing.Size(106, 17);
+            this.AutoTurnOnCheckBox.TabIndex = 14;
+            this.AutoTurnOnCheckBox.Text = "Auto Turn On At:";
+            this.AutoTurnOnCheckBox.UseVisualStyleBackColor = true;
+            this.AutoTurnOnCheckBox.CheckedChanged += new System.EventHandler(this.AutoTurnOnCheckBox_CheckedChanged);
             // 
             // AutoTurnOnTimePicker
             // 
@@ -301,17 +324,6 @@
             this.ErrorLabel.Size = new System.Drawing.Size(0, 13);
             this.ErrorLabel.TabIndex = 13;
             // 
-            // AutoTurnOnCheckBox
-            // 
-            this.AutoTurnOnCheckBox.AutoSize = true;
-            this.AutoTurnOnCheckBox.Location = new System.Drawing.Point(8, 168);
-            this.AutoTurnOnCheckBox.Name = "AutoTurnOnCheckBox";
-            this.AutoTurnOnCheckBox.Size = new System.Drawing.Size(106, 17);
-            this.AutoTurnOnCheckBox.TabIndex = 14;
-            this.AutoTurnOnCheckBox.Text = "Auto Turn On At:";
-            this.AutoTurnOnCheckBox.UseVisualStyleBackColor = true;
-            this.AutoTurnOnCheckBox.CheckedChanged += new System.EventHandler(this.AutoTurnOnCheckBox_CheckedChanged);
-            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -325,7 +337,7 @@
             this.Controls.Add(this.ClearButton);
             this.Controls.Add(this.COMOut);
             this.Name = "Form1";
-            this.Text = "Element COM GUI";
+            this.Text = "Element COM GUI Ver 2.1.1";
             this.LogFileCOMGroupBox.ResumeLayout(false);
             this.LogFileCOMGroupBox.PerformLayout();
             this.MainCOMGroupBox.ResumeLayout(false);
@@ -364,6 +376,7 @@
         private System.Windows.Forms.Label ErrorLabel;
         private System.Windows.Forms.DateTimePicker AutoTurnOnTimePicker;
         private System.Windows.Forms.CheckBox AutoTurnOnCheckBox;
+        private System.Windows.Forms.Label LogfileTransferTimeLabel;
     }
 }
 
