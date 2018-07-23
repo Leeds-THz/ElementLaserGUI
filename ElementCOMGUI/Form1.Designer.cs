@@ -30,7 +30,6 @@
         {
             this.components = new System.ComponentModel.Container();
             this.MainCOMPortSelector = new System.Windows.Forms.ListBox();
-            this.COMOut = new System.Windows.Forms.TextBox();
             this.MainCOMPort = new System.IO.Ports.SerialPort(this.components);
             this.MainConnectButton = new System.Windows.Forms.Button();
             this.CommandButton = new System.Windows.Forms.Button();
@@ -52,13 +51,23 @@
             this.MainDisconnectButton = new System.Windows.Forms.Button();
             this.MainCOMNameLabel = new System.Windows.Forms.Label();
             this.MainCOMConnectionStatusLabel = new System.Windows.Forms.Label();
-            this.COMOutLabel = new System.Windows.Forms.Label();
             this.TempCOMPort = new System.IO.Ports.SerialPort(this.components);
             this.LogFileSaveDialog = new System.Windows.Forms.SaveFileDialog();
             this.LogFileSavePathLabel = new System.Windows.Forms.Label();
             this.ErrorLabel = new System.Windows.Forms.Label();
+            this.tabControl1 = new System.Windows.Forms.TabControl();
+            this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.COMOut = new System.Windows.Forms.TextBox();
+            this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.EventLog = new System.Windows.Forms.DataGridView();
+            this.Time = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Event = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.LogFileCOMGroupBox.SuspendLayout();
             this.MainCOMGroupBox.SuspendLayout();
+            this.tabControl1.SuspendLayout();
+            this.tabPage1.SuspendLayout();
+            this.tabPage2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.EventLog)).BeginInit();
             this.SuspendLayout();
             // 
             // MainCOMPortSelector
@@ -68,16 +77,6 @@
             this.MainCOMPortSelector.Name = "MainCOMPortSelector";
             this.MainCOMPortSelector.Size = new System.Drawing.Size(132, 69);
             this.MainCOMPortSelector.TabIndex = 0;
-            // 
-            // COMOut
-            // 
-            this.COMOut.Location = new System.Drawing.Point(25, 371);
-            this.COMOut.Multiline = true;
-            this.COMOut.Name = "COMOut";
-            this.COMOut.ReadOnly = true;
-            this.COMOut.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.COMOut.Size = new System.Drawing.Size(414, 125);
-            this.COMOut.TabIndex = 1;
             // 
             // MainCOMPort
             // 
@@ -159,7 +158,7 @@
             this.LogFileCOMGroupBox.Controls.Add(this.LogAutoConnectButton);
             this.LogFileCOMGroupBox.Location = new System.Drawing.Point(323, 12);
             this.LogFileCOMGroupBox.Name = "LogFileCOMGroupBox";
-            this.LogFileCOMGroupBox.Size = new System.Drawing.Size(153, 281);
+            this.LogFileCOMGroupBox.Size = new System.Drawing.Size(153, 204);
             this.LogFileCOMGroupBox.TabIndex = 9;
             this.LogFileCOMGroupBox.TabStop = false;
             this.LogFileCOMGroupBox.Text = "Log File COM Port Panel";
@@ -236,7 +235,7 @@
             this.MainCOMGroupBox.Controls.Add(this.MainCOMPortSelector);
             this.MainCOMGroupBox.Location = new System.Drawing.Point(12, 12);
             this.MainCOMGroupBox.Name = "MainCOMGroupBox";
-            this.MainCOMGroupBox.Size = new System.Drawing.Size(311, 281);
+            this.MainCOMGroupBox.Size = new System.Drawing.Size(311, 204);
             this.MainCOMGroupBox.TabIndex = 10;
             this.MainCOMGroupBox.TabStop = false;
             this.MainCOMGroupBox.Text = "Main COM Port Panel";
@@ -256,7 +255,7 @@
             // 
             this.AutoTurnOnTimePicker.CustomFormat = "hh:mm tt";
             this.AutoTurnOnTimePicker.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
-            this.AutoTurnOnTimePicker.Location = new System.Drawing.Point(120, 168);
+            this.AutoTurnOnTimePicker.Location = new System.Drawing.Point(120, 165);
             this.AutoTurnOnTimePicker.Name = "AutoTurnOnTimePicker";
             this.AutoTurnOnTimePicker.ShowUpDown = true;
             this.AutoTurnOnTimePicker.Size = new System.Drawing.Size(80, 20);
@@ -293,15 +292,6 @@
             this.MainCOMConnectionStatusLabel.TabIndex = 8;
             this.MainCOMConnectionStatusLabel.Text = "Not Connected";
             // 
-            // COMOutLabel
-            // 
-            this.COMOutLabel.AutoSize = true;
-            this.COMOutLabel.Location = new System.Drawing.Point(22, 355);
-            this.COMOutLabel.Name = "COMOutLabel";
-            this.COMOutLabel.Size = new System.Drawing.Size(92, 13);
-            this.COMOutLabel.TabIndex = 11;
-            this.COMOutLabel.Text = "Main COM Output";
-            // 
             // TempCOMPort
             // 
             this.TempCOMPort.DataReceived += new System.IO.Ports.SerialDataReceivedEventHandler(this.TempCOMDataRecievedHandler);
@@ -324,24 +314,96 @@
             this.ErrorLabel.Size = new System.Drawing.Size(0, 13);
             this.ErrorLabel.TabIndex = 13;
             // 
+            // tabControl1
+            // 
+            this.tabControl1.Controls.Add(this.tabPage1);
+            this.tabControl1.Controls.Add(this.tabPage2);
+            this.tabControl1.Location = new System.Drawing.Point(12, 222);
+            this.tabControl1.Name = "tabControl1";
+            this.tabControl1.SelectedIndex = 0;
+            this.tabControl1.Size = new System.Drawing.Size(464, 274);
+            this.tabControl1.TabIndex = 14;
+            // 
+            // tabPage1
+            // 
+            this.tabPage1.Controls.Add(this.COMOut);
+            this.tabPage1.Location = new System.Drawing.Point(4, 22);
+            this.tabPage1.Name = "tabPage1";
+            this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage1.Size = new System.Drawing.Size(456, 248);
+            this.tabPage1.TabIndex = 0;
+            this.tabPage1.Text = "Main COM Output";
+            this.tabPage1.UseVisualStyleBackColor = true;
+            // 
+            // COMOut
+            // 
+            this.COMOut.Location = new System.Drawing.Point(6, 6);
+            this.COMOut.Multiline = true;
+            this.COMOut.Name = "COMOut";
+            this.COMOut.ReadOnly = true;
+            this.COMOut.ScrollBars = System.Windows.Forms.ScrollBars.Both;
+            this.COMOut.Size = new System.Drawing.Size(444, 239);
+            this.COMOut.TabIndex = 12;
+            // 
+            // tabPage2
+            // 
+            this.tabPage2.Controls.Add(this.EventLog);
+            this.tabPage2.Location = new System.Drawing.Point(4, 22);
+            this.tabPage2.Name = "tabPage2";
+            this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage2.Size = new System.Drawing.Size(456, 248);
+            this.tabPage2.TabIndex = 1;
+            this.tabPage2.Text = "Event Log";
+            this.tabPage2.UseVisualStyleBackColor = true;
+            // 
+            // EventLog
+            // 
+            this.EventLog.AllowUserToAddRows = false;
+            this.EventLog.AllowUserToDeleteRows = false;
+            this.EventLog.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.EventLog.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.Time,
+            this.Event});
+            this.EventLog.Location = new System.Drawing.Point(9, 6);
+            this.EventLog.Name = "EventLog";
+            this.EventLog.ReadOnly = true;
+            this.EventLog.Size = new System.Drawing.Size(441, 236);
+            this.EventLog.TabIndex = 0;
+            // 
+            // Time
+            // 
+            this.Time.HeaderText = "Time";
+            this.Time.Name = "Time";
+            this.Time.ReadOnly = true;
+            // 
+            // Event
+            // 
+            this.Event.HeaderText = "Event";
+            this.Event.Name = "Event";
+            this.Event.ReadOnly = true;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(488, 527);
+            this.Controls.Add(this.tabControl1);
             this.Controls.Add(this.ErrorLabel);
             this.Controls.Add(this.LogFileSavePathLabel);
-            this.Controls.Add(this.COMOutLabel);
             this.Controls.Add(this.MainCOMGroupBox);
             this.Controls.Add(this.LogFileCOMGroupBox);
             this.Controls.Add(this.ClearButton);
-            this.Controls.Add(this.COMOut);
             this.Name = "Form1";
-            this.Text = "Element COM GUI Ver 2.1.1";
+            this.Text = "Element COM GUI Ver 3.1.3";
             this.LogFileCOMGroupBox.ResumeLayout(false);
             this.LogFileCOMGroupBox.PerformLayout();
             this.MainCOMGroupBox.ResumeLayout(false);
             this.MainCOMGroupBox.PerformLayout();
+            this.tabControl1.ResumeLayout(false);
+            this.tabPage1.ResumeLayout(false);
+            this.tabPage1.PerformLayout();
+            this.tabPage2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.EventLog)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -350,7 +412,6 @@
         #endregion
 
         private System.Windows.Forms.ListBox MainCOMPortSelector;
-        private System.Windows.Forms.TextBox COMOut;
         private System.IO.Ports.SerialPort MainCOMPort;
         private System.Windows.Forms.Button MainConnectButton;
         private System.Windows.Forms.Button CommandButton;
@@ -361,7 +422,6 @@
         private System.Windows.Forms.Button ClearButton;
         private System.Windows.Forms.GroupBox LogFileCOMGroupBox;
         private System.Windows.Forms.GroupBox MainCOMGroupBox;
-        private System.Windows.Forms.Label COMOutLabel;
         private System.Windows.Forms.Label MainCOMConnectionStatusLabel;
         private System.Windows.Forms.Label LogFileCOMPortConnectionStatusLabel;
         private System.Windows.Forms.Button LogAutoConnectButton;
@@ -377,6 +437,13 @@
         private System.Windows.Forms.DateTimePicker AutoTurnOnTimePicker;
         private System.Windows.Forms.CheckBox AutoTurnOnCheckBox;
         private System.Windows.Forms.Label LogfileTransferTimeLabel;
+        private System.Windows.Forms.TabControl tabControl1;
+        private System.Windows.Forms.TabPage tabPage1;
+        private System.Windows.Forms.TextBox COMOut;
+        private System.Windows.Forms.TabPage tabPage2;
+        private System.Windows.Forms.DataGridView EventLog;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Time;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Event;
     }
 }
 

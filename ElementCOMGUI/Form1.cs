@@ -381,6 +381,8 @@ namespace ElementCOMGUI
 
                 // Send the command over the main COM port
                 MainCOMPort.Write(CommandComboBox.Text + "\r");
+
+                LogCommandSent(CommandComboBox.Text);
             }
             else
             {
@@ -588,7 +590,6 @@ namespace ElementCOMGUI
             string pattern = @"\d+(?= BYTES REMAINING)";
             Match match = Regex.Match(logLine, pattern);
 
-            //int bytesRemaining = 0;
             int secondsRemaining = 0;
 
             if (match.Captures.Count == 1 && int.TryParse(match.Value, out int bytesRemaining))
@@ -637,14 +638,31 @@ namespace ElementCOMGUI
         {
             if (!supressAutoTurnOnCheckBoxMessage)
             {
+                // Clear any error messages
+                ClearErrorLabelMessage();
+
                 if (AutoTurnOnCheckBox.Checked)
                 {
-                    MessageBox.Show("The Element will automatically be turned on at " + AutoTurnOnTimePicker.Value.ToShortTimeString());
-                    // MessageBox.Show(AutoTurnOnTimePicker.Value.TimeOfDay.ToString());
+                    
+                    if (!MainCOMPort.IsOpen)
+                    {
+                        SetErrorLabelMessage("Main COM port not connected");
+                        supressAutoTurnOnCheckBoxMessage = true;
+                        AutoTurnOnCheckBox.Checked = false;
+                        return;
+                    }
+                    
 
+                    LogEvent("Element set to turn on at " + AutoTurnOnTimePicker.Value.ToShortTimeString());
+                    //AutoTurnOnTimePicker.Hide();
+                    AutoTurnOnTimePicker.Enabled = false;
+                    MessageBox.Show("The Element will automatically be turned on at " + AutoTurnOnTimePicker.Value.ToShortTimeString());
                 }
                 else
                 {
+                    LogEvent("Element auto turn on unset");
+                    //AutoTurnOnTimePicker.Show();
+                    AutoTurnOnTimePicker.Enabled = true;
                     MessageBox.Show("The Element will not automatically be turned on");
                 }
             }
@@ -665,6 +683,8 @@ namespace ElementCOMGUI
 
                 if (curTime == autoTurnOnTime)
                 {
+                    AutoTurnOnTimePicker.Enabled = true;
+                    //AutoTurnOnTimePicker.Show();
                     return true;
                 }
             }
@@ -687,16 +707,65 @@ namespace ElementCOMGUI
 
             if (!autoTurnOnSentFlag && turnOn)
             {
-                SendTurnOnCommand();
-
-                autoTurnOnSentFlag = true;
-
                 supressAutoTurnOnCheckBoxMessage = true;
 
-                AutoTurnOnCheckBox.Checked = false;
+                if (MainCOMPort.IsOpen)
+                {
+                    SendTurnOnCommand();
 
-                MessageBox.Show("The Element was automatically turned on at " + DateTime.Now.ToShortTimeString());
+                    autoTurnOnSentFlag = true;
+
+                    AutoTurnOnCheckBox.Checked = false;
+
+                    LogEvent("Auto turn on request sent");
+                    MessageBox.Show("The Element was automatically turned on at " + DateTime.Now.ToShortTimeString());
+                }
+                else
+                {
+                    SetErrorLabelMessage("Main COM port not connected");
+                    LogEvent("Auto turn on failed (Main COM port not connected)");
+                    AutoTurnOnCheckBox.Checked = false;
+                }
             }
+        }
+
+        #endregion
+
+        #region EVENT_LOG_FUNCTIONS
+
+        void LogCommandSent(string commandString)
+        {
+            switch (commandString)
+            {
+                case "STATUS=?":
+                    LogEvent("Status request sent");
+                    break;
+                case "STARTLSR=1":
+                    LogEvent("Laser turn on request sent");
+                    break;
+                case "SHUTTER=1":
+                    LogEvent("Shutter opened");
+                    break;
+                case "SHUTTER=0":
+                    LogEvent("Shutter closed");
+                    break;
+                case "STOPLSR=1":
+                    LogEvent("Laser turn off request sent");
+                    break;
+                case "GETLOG=?":
+                    LogEvent("Log file requested");
+                    break;
+                case "RESETLOG=1":
+                    LogEvent("Log reset request sent");
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        void LogEvent(string eventString)
+        {
+            EventLog.Rows.Add(String.Format("{0} {1}", DateTime.Now.ToShortDateString(), DateTime.Now.ToShortTimeString()), eventString);
         }
 
         #endregion
