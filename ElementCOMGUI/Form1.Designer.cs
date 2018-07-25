@@ -401,12 +401,16 @@
             this.StatusDisplay.Rows.Add("Power");
             this.StatusDisplay.Rows.Add("Center WL");
             this.StatusDisplay.Rows.Add("FWHM");
+            this.StatusDisplay.Rows.Add("User Interface Temp");
+            this.StatusDisplay.Rows.Add("Cavity Temp");
+            this.StatusDisplay.Rows.Add("Pump Laser Temp");
+            this.StatusDisplay.Rows.Add("Diagnostics Temp");
             this.StatusDisplay.Rows.Add("4QD (532 nm) SUM");
             this.StatusDisplay.Rows.Add("4QD (532 nm) X");
             this.StatusDisplay.Rows.Add("4QD (532 nm) Y");
             this.StatusDisplay.Rows.Add("4QD (800 nm) SUM");
             this.StatusDisplay.Rows.Add("4QD (800 nm) X");
-            this.StatusDisplay.Rows.Add("4QD 3(800 nm) Y");
+            this.StatusDisplay.Rows.Add("4QD (800 nm) Y");
             // 
             // MainCOMOutputTab
             // 
@@ -489,7 +493,7 @@
             this.Controls.Add(this.LogFileCOMGroupBox);
             this.Controls.Add(this.ClearButton);
             this.Name = "Form1";
-            this.Text = "Element COM GUI Ver 3.1.3";
+            this.Text = "Element COM GUI Ver 4.2.0";
             this.LogFileCOMGroupBox.ResumeLayout(false);
             this.LogFileCOMGroupBox.PerformLayout();
             this.MainCOMGroupBox.ResumeLayout(false);

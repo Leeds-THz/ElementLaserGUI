@@ -18,6 +18,7 @@ namespace ElementCOMGUI
         private bool logFileWriteFlag = false; // Flag set high when log file is being written to
         private bool autoTurnOnSentFlag = false; // Flag set high when auto turn on has been requested
         private bool supressAutoTurnOnCheckBoxMessage = false; // Flag set high when the program is altering the state of the auto turn on check box
+        private DateTime prevTime = DateTime.Now;
 
         #endregion
 
@@ -284,7 +285,23 @@ namespace ElementCOMGUI
                 MainCOMDataBuffer.RemoveAt(0);
             }
 
+            
+            // Check if a minute has elapsed
+            if (prevTime.Minute != DateTime.Now.Minute && !(DateTime.Now == AutoTurnOnTimePicker.Value && AutoTurnOnCheckBox.Checked))
+            {
+                // If main port is open, send a staus request
+                if (MainCOMPort.IsOpen && !LogfileTransferTimeLabel.Visible)
+                {
+                    SendMainCOMCommand("STATUS=?");
+                }
+
+                // Set prevTime to current time
+                prevTime = DateTime.Now;
+            }
+
             ParseLastLine();
+
+            DisplayLaserReady();
 
             AutoTurnOn();
         }
@@ -335,6 +352,17 @@ namespace ElementCOMGUI
             ConnectCOM(MainCOMPort, MainCOMPortSelector.Text);
         }
 
+        private void SendMainCOMCommand(string command)
+        {
+            if (MainCOMPort.IsOpen)
+            {
+                // Send the command over the main COM port
+                MainCOMPort.Write(command + "\r");
+
+                LogCommandSent(command);
+            }
+        }
+
         /// <summary>
         /// Function to be called when the send command button is clicked
         /// </summary>
@@ -380,9 +408,7 @@ namespace ElementCOMGUI
                 }
 
                 // Send the command over the main COM port
-                MainCOMPort.Write(CommandComboBox.Text + "\r");
-
-                LogCommandSent(CommandComboBox.Text);
+                SendMainCOMCommand(CommandComboBox.Text);
             }
             else
             {
@@ -645,6 +671,92 @@ namespace ElementCOMGUI
 
         #region STATUS_CHECKING
 
+        #region LASER_READY_CHECKING
+
+        void DisplayLaserReady()
+        {
+            var prevState = PrevLaserReady();
+
+            if (IsLaserReady())
+            {
+                LaserReadyLabel.Text = "Laser Ready!";
+                LaserReadyLabel.ForeColor = System.Drawing.Color.Green;
+
+                if (!prevState)
+                {
+                    LogEvent("Laser ready");
+                }
+            }
+            else
+            {
+                LaserReadyLabel.Text = "Laser Not Ready!";
+                LaserReadyLabel.ForeColor = System.Drawing.Color.Red;
+
+                if (prevState)
+                {
+                    LogEvent("Laser not ready");
+                }
+            }
+        }
+
+        bool PrevLaserReady()
+        {
+            if (LaserReadyLabel.Text == "Laser Ready!")
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        bool IsLaserReady()
+        {
+            // If |Power diff| < 10 and |CWL| < 10 and |FWHM| < 10 and Warm Up == NO
+            var warmUpString = GetStatusCell("Warming Up", 1);
+            var powerDiffString = GetStatusCell("Power", 3);
+            var CWLDiffString = GetStatusCell("Center WL", 3);
+            var FWHMDiffString = GetStatusCell("FWHM", 3);
+
+            if (warmUpString == "NO" && StringAbsValueInLimits(powerDiffString, 10) && StringAbsValueInLimits(CWLDiffString, 10) && StringAbsValueInLimits(FWHMDiffString, 10))
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        bool StringAbsValueInLimits(string value, int threshold)
+        {
+            var numString = RegexSingleGroupMatch(value, @"(\d+)");
+            if (numString != "")
+            {
+                int intValue = int.Parse(numString);
+
+                if (intValue <= threshold)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+
+        }
+
+        string GetStatusCell(string property, int column)
+        {
+            // Get index
+            var propertyIndex = GetStatusRowPropertyIndex(property);
+
+            if (propertyIndex == -1)
+            {
+                return "";
+            }
+
+            return (string)StatusDisplay.Rows[propertyIndex].Cells[column].Value;
+        }
+
+        #endregion
+
         void CheckStatus()
         {
             var lastLines = GetTextBoxLastLines(COMOut, 50);
@@ -668,6 +780,10 @@ namespace ElementCOMGUI
             QD3SUMDisplay(logLine);
             QD3XDisplay(logLine);
             QD3YDisplay(logLine);
+            USRITempDisplay(logLine);
+            CAVITempDisplay(logLine);
+            PUMPTempDisplay(logLine);
+            DIAGTempDisplay(logLine);
         }
 
         int GetStatusRowPropertyIndex(string propertyString)
@@ -689,6 +805,11 @@ namespace ElementCOMGUI
                 // Get index
                 var propertyIndex = GetStatusRowPropertyIndex(property);
 
+                if (propertyIndex == -1)
+                {
+                    return;
+                }
+
                 // Set status
                 StatusDisplay.Rows[propertyIndex].Cells[1].Value = status;
             }
@@ -701,6 +822,11 @@ namespace ElementCOMGUI
                 // Get index
                 var propertyIndex = GetStatusRowPropertyIndex(property);
 
+                if (propertyIndex == -1)
+                {
+                    return;
+                }
+
                 // Set status
                 for (int i = 0; i < status.Count; i++)
                 {
@@ -712,32 +838,36 @@ namespace ElementCOMGUI
 
         string RegexSingleGroupMatch(string line, string regex)
         {
-            Match match = Regex.Match(line, regex);
-
-            if (match.Groups.Count == 2)
+            if (line != null)
             {
-                return match.Groups[1].Value;
-            }
+                Match match = Regex.Match(line, regex);
 
+                if (match.Groups.Count == 2)
+                {
+                    return match.Groups[1].Value;
+                }
+            }
             return "";
         }
 
         List<string> RegexMultiGroupMatch(string line, string regex, int groupCount)
         {
-            Match match = Regex.Match(line, regex);
-
-            if (match.Groups.Count == groupCount + 1)
+            if (line != null)
             {
-                var outStringList = new List<string>();
+                Match match = Regex.Match(line, regex);
 
-                for (int i = 0; i < groupCount; i++)
+                if (match.Groups.Count == groupCount + 1)
                 {
-                    outStringList.Add(match.Groups[i + 1].Value);
+                    var outStringList = new List<string>();
+
+                    for (int i = 0; i < groupCount; i++)
+                    {
+                        outStringList.Add(match.Groups[i + 1].Value);
+                    }
+
+                    return outStringList;
                 }
-
-                return outStringList;
             }
-
             return null;
         }
 
@@ -757,65 +887,93 @@ namespace ElementCOMGUI
 
         void PowerDisplay(string logLine)
         {
-            var status = RegexMultiGroupMatch(logLine, @"P 800 CAL;\s*(-?\d+)\s*mW;\s*(-?\d+)\s*mW;\s*(-?\d*)\s*mW;", 3);
+            var status = RegexMultiGroupMatch(logLine, @"P 800 CAL;\s*(-?\d+)\s*mW;\s*(-?\d+)\s*mW;\s*(-?\d+)\s*mW;", 3);
 
             SetStatus("Power", status);
         }
 
         void CenterWLDisplay(string logLine)
         {
-            var status = RegexMultiGroupMatch(logLine, @"CENTER WL;\s*(-?\d+)\s*nm;\s*(-?\d+)\s*nm;\s*(-?\d*)\s*nm;", 3);
+            var status = RegexMultiGroupMatch(logLine, @"CENTER WL;\s*(-?\d+)\s*nm;\s*(-?\d+)\s*nm;\s*(-?\d+)\s*nm;", 3);
 
             SetStatus("Center WL", status);
         }
 
         void FWHMDisplay(string logLine)
         {
-            var status = RegexMultiGroupMatch(logLine, @"FWHM  800;\s*(-?\d+)\s*nm;\s*(-?\d+)\s*nm;\s*(-?\d*)\s*nm;", 3);
+            var status = RegexMultiGroupMatch(logLine, @"FWHM  800;\s*(-?\d+)\s*nm;\s*(-?\d+)\s*nm;\s*(-?\d+)\s*nm;", 3);
 
             SetStatus("FWHM", status);
         }
 
         void QD1SUMDisplay(string logLine)
         {
-            var status = RegexMultiGroupMatch(logLine, @"4QD  1  SUM;\s*(-?\d+)\s*;\s*(-?\d+)\s*;\s*(-?\d*)\s*;", 3);
+            var status = RegexMultiGroupMatch(logLine, @"4QD  1  SUM;\s*(-?\d+)\s*;\s*(-?\d+)\s*;\s*(-?\d+)\s*;", 3);
 
             SetStatus("4QD (532 nm) SUM", status);
         }
 
         void QD1XDisplay(string logLine)
         {
-            var status = RegexMultiGroupMatch(logLine, @"4QD  1  X;\s*(-?\+?\d+)\s*;\s*(-?\+?\d+)\s*;\s*(-?\+?\d*)\s*;", 3);
+            var status = RegexMultiGroupMatch(logLine, @"4QD  1  X;\s*(-?\+?\d+)\s*;\s*(-?\+?\d+)\s*;\s*(-?\+?\d+)\s*;", 3);
 
             SetStatus("4QD (532 nm) X", status);
         }
 
         void QD1YDisplay(string logLine)
         {
-            var status = RegexMultiGroupMatch(logLine, @"4QD  1  Y;\s*(-?\+?\d+)\s*;\s*(-?\+?\d+)\s*;\s*(-?\+?\d*)\s*;", 3);
+            var status = RegexMultiGroupMatch(logLine, @"4QD  1  Y;\s*(-?\+?\d+)\s*;\s*(-?\+?\d+)\s*;\s*(-?\+?\d+)\s*;", 3);
 
             SetStatus("4QD (532 nm) Y", status);
         }
 
         void QD3SUMDisplay(string logLine)
         {
-            var status = RegexMultiGroupMatch(logLine, @"4QD  3  SUM;\s*(-?\d+)\s*;\s*(-?\d+)\s*;\s*(-?\d*)\s*;", 3);
+            var status = RegexMultiGroupMatch(logLine, @"4QD  3  SUM;\s*(-?\d+)\s*;\s*(-?\d+)\s*;\s*(-?\d+)\s*;", 3);
 
             SetStatus("4QD (800 nm) SUM", status);
         }
 
         void QD3XDisplay(string logLine)
         {
-            var status = RegexMultiGroupMatch(logLine, @"4QD  3  X;\s*(-?\+?\d+)\s*;\s*(-?\+?\d+)\s*;\s*(-?\+?\d*)\s*;", 3);
+            var status = RegexMultiGroupMatch(logLine, @"4QD  3  X;\s*(-?\+?\d+)\s*;\s*(-?\+?\d+)\s*;\s*(-?\+?\d+)\s*;", 3);
 
             SetStatus("4QD (800 nm) X", status);
         }
 
         void QD3YDisplay(string logLine)
         {
-            var status = RegexMultiGroupMatch(logLine, @"4QD  3  Y;\s*(-?\+?\d+)\s*;\s*(-?\+?\d+)\s*;\s*(-?\+?\d*)\s*;", 3);
+            var status = RegexMultiGroupMatch(logLine, @"4QD  3  Y;\s*(-?\+?\d+)\s*;\s*(-?\+?\d+)\s*;\s*(-?\+?\d+)\s*;", 3);
 
             SetStatus("4QD (800 nm) Y", status);
+        }
+
+        void USRITempDisplay(string logLine)
+        {
+            var status = RegexMultiGroupMatch(logLine, @"TEMP USRI;\s*(-?\+?\d+.?\d*)\s*;\s*(-?\+?\d+.?\d*)\s*;\s*(-?\+?\d+.?\d*)\s*;", 3);
+
+            SetStatus("User Interface Temp", status);
+        }
+
+        void CAVITempDisplay(string logLine)
+        {
+            var status = RegexMultiGroupMatch(logLine, @"TEMP CAVI;\s*(-?\+?\d+.?\d*)\s*;\s*(-?\+?\d+.?\d*)\s*;\s*(-?\+?\d+.?\d*)\s*;", 3);
+
+            SetStatus("Cavity Temp", status);
+        }
+
+        void PUMPTempDisplay(string logLine)
+        {
+            var status = RegexMultiGroupMatch(logLine, @"TEMP PUMP;\s*(-?\+?\d+.?\d*)\s*;\s*(-?\+?\d+.?\d*)\s*;\s*(-?\+?\d+.?\d*)\s*;", 3);
+
+            SetStatus("Pump Laser Temp", status);
+        }
+
+        void DIAGTempDisplay(string logLine)
+        {
+            var status = RegexMultiGroupMatch(logLine, @"TEMP DIAG;\s*(-?\+?\d+.?\d*)\s*;\s*(-?\+?\d+.?\d*)\s*;\s*(-?\+?\d+.?\d*)\s*;", 3);
+
+            SetStatus("Diagnostics Temp", status);
         }
 
         #endregion
