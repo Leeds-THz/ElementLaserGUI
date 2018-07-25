@@ -322,7 +322,7 @@
             // 
             this.ErrorLabel.AutoSize = true;
             this.ErrorLabel.ForeColor = System.Drawing.Color.Red;
-            this.ErrorLabel.Location = new System.Drawing.Point(106, 505);
+            this.ErrorLabel.Location = new System.Drawing.Point(12, 505);
             this.ErrorLabel.Name = "ErrorLabel";
             this.ErrorLabel.Size = new System.Drawing.Size(0, 13);
             this.ErrorLabel.TabIndex = 13;
@@ -493,7 +493,7 @@
             this.Controls.Add(this.MainCOMGroupBox);
             this.Controls.Add(this.LogFileCOMGroupBox);
             this.Name = "Form1";
-            this.Text = "Element COM GUI Ver 4.2.1";
+            this.Text = "Element COM GUI Ver 4.2.2";
             this.LogFileCOMGroupBox.ResumeLayout(false);
             this.LogFileCOMGroupBox.PerformLayout();
             this.MainCOMGroupBox.ResumeLayout(false);
