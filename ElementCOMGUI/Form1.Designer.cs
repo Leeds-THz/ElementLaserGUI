@@ -153,7 +153,7 @@
             // 
             // ClearButton
             // 
-            this.ClearButton.Location = new System.Drawing.Point(25, 502);
+            this.ClearButton.Location = new System.Drawing.Point(6, 222);
             this.ClearButton.Name = "ClearButton";
             this.ClearButton.Size = new System.Drawing.Size(75, 20);
             this.ClearButton.TabIndex = 8;
@@ -415,6 +415,7 @@
             // MainCOMOutputTab
             // 
             this.MainCOMOutputTab.Controls.Add(this.COMOut);
+            this.MainCOMOutputTab.Controls.Add(this.ClearButton);
             this.MainCOMOutputTab.Location = new System.Drawing.Point(4, 22);
             this.MainCOMOutputTab.Name = "MainCOMOutputTab";
             this.MainCOMOutputTab.Padding = new System.Windows.Forms.Padding(3);
@@ -430,7 +431,7 @@
             this.COMOut.Name = "COMOut";
             this.COMOut.ReadOnly = true;
             this.COMOut.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.COMOut.Size = new System.Drawing.Size(444, 239);
+            this.COMOut.Size = new System.Drawing.Size(444, 210);
             this.COMOut.TabIndex = 12;
             // 
             // EventLogTab
@@ -491,9 +492,8 @@
             this.Controls.Add(this.LogFileSavePathLabel);
             this.Controls.Add(this.MainCOMGroupBox);
             this.Controls.Add(this.LogFileCOMGroupBox);
-            this.Controls.Add(this.ClearButton);
             this.Name = "Form1";
-            this.Text = "Element COM GUI Ver 4.2.0";
+            this.Text = "Element COM GUI Ver 4.2.1";
             this.LogFileCOMGroupBox.ResumeLayout(false);
             this.LogFileCOMGroupBox.PerformLayout();
             this.MainCOMGroupBox.ResumeLayout(false);
