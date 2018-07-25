@@ -284,7 +284,7 @@ namespace ElementCOMGUI
                 MainCOMDataBuffer.RemoveAt(0);
             }
 
-            DisplayLogFileTimeRemaining();
+            ParseLastLine();
 
             AutoTurnOn();
         }
@@ -562,6 +562,20 @@ namespace ElementCOMGUI
             }
         }
 
+        List<string> GetTextBoxLastLines(TextBox textBox, int lineCount)
+        {
+            var lines = TakeLastLines(textBox.Text, lineCount + 1);
+
+            if (lines.Count == 0)
+            {
+                return null;
+            }
+            else
+            {
+                return lines;
+            }
+        }
+
         /// <summary>
         /// Retrieves the last n lines from a multiline string. Code taken from "https://stackoverflow.com/questions/11942885/take-the-last-n-lines-of-a-string-c-sharp"
         /// </summary>
@@ -580,6 +594,16 @@ namespace ElementCOMGUI
             }
 
             return lines;
+        }
+
+        void ParseLastLine()
+        {
+            // Read last line of COMOUT
+            string lastLine = GetTextBoxLastLine(COMOut);
+
+            DisplayLogFileTimeRemaining(lastLine);
+
+            CheckStatus();
         }
 
         #region LOGFILE_TIME_ESTIMATOR
@@ -601,13 +625,8 @@ namespace ElementCOMGUI
             return secondsRemaining;
         }
 
-        
-
-        void DisplayLogFileTimeRemaining()
+        void DisplayLogFileTimeRemaining(string lastLine)
         {
-            // Read last line of COMOUT
-            string lastLine = GetTextBoxLastLine(COMOut);
-
             int secondsRemaining = LogfileTransferSecondsRemaining(lastLine);
 
             if (secondsRemaining == 0)
@@ -620,6 +639,183 @@ namespace ElementCOMGUI
 
                 LogfileTransferTimeLabel.Text = String.Format("File Transfer Time Remaining:\n{0} Second(s)", secondsRemaining);
             }
+        }
+
+        #endregion
+
+        #region STATUS_CHECKING
+
+        void CheckStatus()
+        {
+            var lastLines = GetTextBoxLastLines(COMOut, 50);
+
+            foreach (var line in lastLines)
+            {
+                CheckStatusLine(line);
+            }
+        }
+
+        void CheckStatusLine(string logLine)
+        {
+            WarmUpDisplay(logLine);
+            ShutterDisplay(logLine);
+            PowerDisplay(logLine);
+            CenterWLDisplay(logLine);
+            FWHMDisplay(logLine);
+            QD1SUMDisplay(logLine);
+            QD1XDisplay(logLine);
+            QD1YDisplay(logLine);
+            QD3SUMDisplay(logLine);
+            QD3XDisplay(logLine);
+            QD3YDisplay(logLine);
+        }
+
+        int GetStatusRowPropertyIndex(string propertyString)
+        {
+            for (int i = 0; i < StatusDisplay.Rows.Count; i++)
+            {
+                if (StatusDisplay.Rows[i].Cells[0].Value == propertyString)
+                {
+                    return i;
+                }
+            }
+            return -1;
+        }
+
+        void SetStatus(string property, string status)
+        {
+            if (status != "")
+            {
+                // Get index
+                var propertyIndex = GetStatusRowPropertyIndex(property);
+
+                // Set status
+                StatusDisplay.Rows[propertyIndex].Cells[1].Value = status;
+            }
+        }
+
+        void SetStatus(string property, List<string> status)
+        {
+            if (status != null)
+            {
+                // Get index
+                var propertyIndex = GetStatusRowPropertyIndex(property);
+
+                // Set status
+                for (int i = 0; i < status.Count; i++)
+                {
+                    StatusDisplay.Rows[propertyIndex].Cells[i+1].Value = status[i];
+                }
+                
+            }
+        }
+
+        string RegexSingleGroupMatch(string line, string regex)
+        {
+            Match match = Regex.Match(line, regex);
+
+            if (match.Groups.Count == 2)
+            {
+                return match.Groups[1].Value;
+            }
+
+            return "";
+        }
+
+        List<string> RegexMultiGroupMatch(string line, string regex, int groupCount)
+        {
+            Match match = Regex.Match(line, regex);
+
+            if (match.Groups.Count == groupCount + 1)
+            {
+                var outStringList = new List<string>();
+
+                for (int i = 0; i < groupCount; i++)
+                {
+                    outStringList.Add(match.Groups[i + 1].Value);
+                }
+
+                return outStringList;
+            }
+
+            return null;
+        }
+
+        void WarmUpDisplay(string logLine)
+        {
+            var status = RegexSingleGroupMatch(logLine, @"WARM UP;(\w+);");
+
+            SetStatus("Warming Up", status);
+        }
+
+        void ShutterDisplay(string logLine)
+        {
+            var status = RegexSingleGroupMatch(logLine, @"SHUTTER;(\w+);");
+
+            SetStatus("Shutter", status);
+        }
+
+        void PowerDisplay(string logLine)
+        {
+            var status = RegexMultiGroupMatch(logLine, @"P 800 CAL;\s*(-?\d+)\s*mW;\s*(-?\d+)\s*mW;\s*(-?\d*)\s*mW;", 3);
+
+            SetStatus("Power", status);
+        }
+
+        void CenterWLDisplay(string logLine)
+        {
+            var status = RegexMultiGroupMatch(logLine, @"CENTER WL;\s*(-?\d+)\s*nm;\s*(-?\d+)\s*nm;\s*(-?\d*)\s*nm;", 3);
+
+            SetStatus("Center WL", status);
+        }
+
+        void FWHMDisplay(string logLine)
+        {
+            var status = RegexMultiGroupMatch(logLine, @"FWHM  800;\s*(-?\d+)\s*nm;\s*(-?\d+)\s*nm;\s*(-?\d*)\s*nm;", 3);
+
+            SetStatus("FWHM", status);
+        }
+
+        void QD1SUMDisplay(string logLine)
+        {
+            var status = RegexMultiGroupMatch(logLine, @"4QD  1  SUM;\s*(-?\d+)\s*;\s*(-?\d+)\s*;\s*(-?\d*)\s*;", 3);
+
+            SetStatus("4QD (532 nm) SUM", status);
+        }
+
+        void QD1XDisplay(string logLine)
+        {
+            var status = RegexMultiGroupMatch(logLine, @"4QD  1  X;\s*(-?\+?\d+)\s*;\s*(-?\+?\d+)\s*;\s*(-?\+?\d*)\s*;", 3);
+
+            SetStatus("4QD (532 nm) X", status);
+        }
+
+        void QD1YDisplay(string logLine)
+        {
+            var status = RegexMultiGroupMatch(logLine, @"4QD  1  Y;\s*(-?\+?\d+)\s*;\s*(-?\+?\d+)\s*;\s*(-?\+?\d*)\s*;", 3);
+
+            SetStatus("4QD (532 nm) Y", status);
+        }
+
+        void QD3SUMDisplay(string logLine)
+        {
+            var status = RegexMultiGroupMatch(logLine, @"4QD  3  SUM;\s*(-?\d+)\s*;\s*(-?\d+)\s*;\s*(-?\d*)\s*;", 3);
+
+            SetStatus("4QD (800 nm) SUM", status);
+        }
+
+        void QD3XDisplay(string logLine)
+        {
+            var status = RegexMultiGroupMatch(logLine, @"4QD  3  X;\s*(-?\+?\d+)\s*;\s*(-?\+?\d+)\s*;\s*(-?\+?\d*)\s*;", 3);
+
+            SetStatus("4QD (800 nm) X", status);
+        }
+
+        void QD3YDisplay(string logLine)
+        {
+            var status = RegexMultiGroupMatch(logLine, @"4QD  3  Y;\s*(-?\+?\d+)\s*;\s*(-?\+?\d+)\s*;\s*(-?\+?\d*)\s*;", 3);
+
+            SetStatus("4QD (800 nm) Y", status);
         }
 
         #endregion

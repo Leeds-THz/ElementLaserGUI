@@ -56,19 +56,32 @@
             this.LogFileSavePathLabel = new System.Windows.Forms.Label();
             this.ErrorLabel = new System.Windows.Forms.Label();
             this.tabControl1 = new System.Windows.Forms.TabControl();
-            this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.StatusTab = new System.Windows.Forms.TabPage();
+            this.StatusDisplay = new System.Windows.Forms.DataGridView();
+            this.Property = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Current = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Reference = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Difference = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.MainCOMOutputTab = new System.Windows.Forms.TabPage();
             this.COMOut = new System.Windows.Forms.TextBox();
-            this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.EventLogTab = new System.Windows.Forms.TabPage();
             this.EventLog = new System.Windows.Forms.DataGridView();
             this.Time = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Event = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.LaserReadyLabel = new System.Windows.Forms.Label();
             this.LogFileCOMGroupBox.SuspendLayout();
             this.MainCOMGroupBox.SuspendLayout();
             this.tabControl1.SuspendLayout();
-            this.tabPage1.SuspendLayout();
-            this.tabPage2.SuspendLayout();
+            this.StatusTab.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.StatusDisplay)).BeginInit();
+            this.MainCOMOutputTab.SuspendLayout();
+            this.EventLogTab.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.EventLog)).BeginInit();
             this.SuspendLayout();
+
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+            this.MaximizeBox = false;
+
             // 
             // MainCOMPortSelector
             // 
@@ -316,24 +329,95 @@
             // 
             // tabControl1
             // 
-            this.tabControl1.Controls.Add(this.tabPage1);
-            this.tabControl1.Controls.Add(this.tabPage2);
+            this.tabControl1.Controls.Add(this.StatusTab);
+            this.tabControl1.Controls.Add(this.MainCOMOutputTab);
+            this.tabControl1.Controls.Add(this.EventLogTab);
             this.tabControl1.Location = new System.Drawing.Point(12, 222);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
             this.tabControl1.Size = new System.Drawing.Size(464, 274);
             this.tabControl1.TabIndex = 14;
             // 
-            // tabPage1
+            // StatusTab
             // 
-            this.tabPage1.Controls.Add(this.COMOut);
-            this.tabPage1.Location = new System.Drawing.Point(4, 22);
-            this.tabPage1.Name = "tabPage1";
-            this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(456, 248);
-            this.tabPage1.TabIndex = 0;
-            this.tabPage1.Text = "Main COM Output";
-            this.tabPage1.UseVisualStyleBackColor = true;
+            this.StatusTab.Controls.Add(this.LaserReadyLabel);
+            this.StatusTab.Controls.Add(this.StatusDisplay);
+            this.StatusTab.Location = new System.Drawing.Point(4, 22);
+            this.StatusTab.Name = "StatusTab";
+            this.StatusTab.Padding = new System.Windows.Forms.Padding(3);
+            this.StatusTab.Size = new System.Drawing.Size(456, 248);
+            this.StatusTab.TabIndex = 2;
+            this.StatusTab.Text = "Status";
+            this.StatusTab.UseVisualStyleBackColor = true;
+            // 
+            // StatusDisplay
+            // 
+            this.StatusDisplay.AllowUserToAddRows = false;
+            this.StatusDisplay.AllowUserToDeleteRows = false;
+            this.StatusDisplay.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.StatusDisplay.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.Property,
+            this.Current,
+            this.Reference,
+            this.Difference});
+            this.StatusDisplay.Location = new System.Drawing.Point(9, 19);
+            this.StatusDisplay.Name = "StatusDisplay";
+            this.StatusDisplay.ReadOnly = true;
+            this.StatusDisplay.Size = new System.Drawing.Size(441, 214);
+            this.StatusDisplay.TabIndex = 0;
+            this.StatusDisplay.Columns[0].SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.StatusDisplay.Columns[1].SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.StatusDisplay.Columns[2].SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.StatusDisplay.Columns[3].SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            // 
+            // Property
+            // 
+            this.Property.HeaderText = "";
+            this.Property.Name = "Property";
+            this.Property.ReadOnly = true;
+            // 
+            // Current
+            // 
+            this.Current.HeaderText = "Current";
+            this.Current.Name = "Current";
+            this.Current.ReadOnly = true;
+            // 
+            // Reference
+            // 
+            this.Reference.HeaderText = "Reference";
+            this.Reference.Name = "Reference";
+            this.Reference.ReadOnly = true;
+            // 
+            // Difference
+            // 
+            this.Difference.HeaderText = "Difference";
+            this.Difference.Name = "Difference";
+            this.Difference.ReadOnly = true;
+            ///
+            /// Status rows
+            /// 
+            this.StatusDisplay.Rows.Add("Warming Up");
+            this.StatusDisplay.Rows.Add("Shutter");
+            this.StatusDisplay.Rows.Add("Power");
+            this.StatusDisplay.Rows.Add("Center WL");
+            this.StatusDisplay.Rows.Add("FWHM");
+            this.StatusDisplay.Rows.Add("4QD (532 nm) SUM");
+            this.StatusDisplay.Rows.Add("4QD (532 nm) X");
+            this.StatusDisplay.Rows.Add("4QD (532 nm) Y");
+            this.StatusDisplay.Rows.Add("4QD (800 nm) SUM");
+            this.StatusDisplay.Rows.Add("4QD (800 nm) X");
+            this.StatusDisplay.Rows.Add("4QD 3(800 nm) Y");
+            // 
+            // MainCOMOutputTab
+            // 
+            this.MainCOMOutputTab.Controls.Add(this.COMOut);
+            this.MainCOMOutputTab.Location = new System.Drawing.Point(4, 22);
+            this.MainCOMOutputTab.Name = "MainCOMOutputTab";
+            this.MainCOMOutputTab.Padding = new System.Windows.Forms.Padding(3);
+            this.MainCOMOutputTab.Size = new System.Drawing.Size(456, 248);
+            this.MainCOMOutputTab.TabIndex = 0;
+            this.MainCOMOutputTab.Text = "Main COM Output";
+            this.MainCOMOutputTab.UseVisualStyleBackColor = true;
             // 
             // COMOut
             // 
@@ -345,16 +429,16 @@
             this.COMOut.Size = new System.Drawing.Size(444, 239);
             this.COMOut.TabIndex = 12;
             // 
-            // tabPage2
+            // EventLogTab
             // 
-            this.tabPage2.Controls.Add(this.EventLog);
-            this.tabPage2.Location = new System.Drawing.Point(4, 22);
-            this.tabPage2.Name = "tabPage2";
-            this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(456, 248);
-            this.tabPage2.TabIndex = 1;
-            this.tabPage2.Text = "Event Log";
-            this.tabPage2.UseVisualStyleBackColor = true;
+            this.EventLogTab.Controls.Add(this.EventLog);
+            this.EventLogTab.Location = new System.Drawing.Point(4, 22);
+            this.EventLogTab.Name = "EventLogTab";
+            this.EventLogTab.Padding = new System.Windows.Forms.Padding(3);
+            this.EventLogTab.Size = new System.Drawing.Size(456, 248);
+            this.EventLogTab.TabIndex = 1;
+            this.EventLogTab.Text = "Event Log";
+            this.EventLogTab.UseVisualStyleBackColor = true;
             // 
             // EventLog
             // 
@@ -369,6 +453,8 @@
             this.EventLog.ReadOnly = true;
             this.EventLog.Size = new System.Drawing.Size(441, 236);
             this.EventLog.TabIndex = 0;
+            this.EventLog.Columns[0].SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.EventLog.Columns[1].SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             // 
             // Time
             // 
@@ -381,6 +467,15 @@
             this.Event.HeaderText = "Event";
             this.Event.Name = "Event";
             this.Event.ReadOnly = true;
+            // 
+            // LaserReadyLabel
+            // 
+            this.LaserReadyLabel.AutoSize = true;
+            this.LaserReadyLabel.Location = new System.Drawing.Point(6, 3);
+            this.LaserReadyLabel.Name = "LaserReadyLabel";
+            this.LaserReadyLabel.Size = new System.Drawing.Size(67, 13);
+            this.LaserReadyLabel.TabIndex = 1;
+            this.LaserReadyLabel.Text = "Laser Ready";
             // 
             // Form1
             // 
@@ -400,9 +495,12 @@
             this.MainCOMGroupBox.ResumeLayout(false);
             this.MainCOMGroupBox.PerformLayout();
             this.tabControl1.ResumeLayout(false);
-            this.tabPage1.ResumeLayout(false);
-            this.tabPage1.PerformLayout();
-            this.tabPage2.ResumeLayout(false);
+            this.StatusTab.ResumeLayout(false);
+            this.StatusTab.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.StatusDisplay)).EndInit();
+            this.MainCOMOutputTab.ResumeLayout(false);
+            this.MainCOMOutputTab.PerformLayout();
+            this.EventLogTab.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.EventLog)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -438,12 +536,19 @@
         private System.Windows.Forms.CheckBox AutoTurnOnCheckBox;
         private System.Windows.Forms.Label LogfileTransferTimeLabel;
         private System.Windows.Forms.TabControl tabControl1;
-        private System.Windows.Forms.TabPage tabPage1;
+        private System.Windows.Forms.TabPage MainCOMOutputTab;
         private System.Windows.Forms.TextBox COMOut;
-        private System.Windows.Forms.TabPage tabPage2;
+        private System.Windows.Forms.TabPage EventLogTab;
         private System.Windows.Forms.DataGridView EventLog;
         private System.Windows.Forms.DataGridViewTextBoxColumn Time;
         private System.Windows.Forms.DataGridViewTextBoxColumn Event;
+        private System.Windows.Forms.TabPage StatusTab;
+        private System.Windows.Forms.DataGridView StatusDisplay;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Property;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Current;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Reference;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Difference;
+        private System.Windows.Forms.Label LaserReadyLabel;
     }
 }
 
