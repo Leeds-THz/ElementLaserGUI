@@ -908,7 +908,7 @@ namespace ElementCOMGUI
 
         void QD1SUMDisplay(string logLine)
         {
-            var status = RegexMultiGroupMatch(logLine, @"4QD  1  SUM;\s*(-?\d+)\s*;\s*(-?\d+)\s*;\s*(-?\d+)\s*;", 3);
+            var status = RegexMultiGroupMatch(logLine, @"4QD  1  SUM;\s*(-?\+?\d+)\s*;\s*(-?\+?\d+)\s*;\s*(-?\+?\d+)\s*;", 3);
 
             SetStatus("4QD (532 nm) SUM", status);
         }
