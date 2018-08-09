@@ -518,7 +518,7 @@
             this.Controls.Add(this.MainCOMGroupBox);
             this.Controls.Add(this.LogFileCOMGroupBox);
             this.Name = "Form1";
-            this.Text = "Element COM GUI Ver 4.4.3";
+            this.Text = "Element COM GUI Ver 4.4.4";
             this.LogFileCOMGroupBox.ResumeLayout(false);
             this.LogFileCOMGroupBox.PerformLayout();
             this.MainCOMGroupBox.ResumeLayout(false);

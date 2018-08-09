@@ -288,7 +288,7 @@ namespace ElementCOMGUI
 
             
             // Check if a minute has elapsed
-            if (prevTime.Minute != DateTime.Now.Minute && !(DateTime.Now == AutoTurnOnTimePicker.Value && AutoTurnOnCheckBox.Checked))
+            if (DateTime.Now.Second == 5 && prevTime.Minute != DateTime.Now.Minute && !(DateTime.Now == AutoTurnOnTimePicker.Value && AutoTurnOnCheckBox.Checked))
             {
                 // If main port is open, send a staus request
                 if (MainCOMPort.IsOpen && !LogfileTransferTimeLabel.Visible)
