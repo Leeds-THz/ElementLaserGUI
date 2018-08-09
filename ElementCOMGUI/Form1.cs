@@ -1087,6 +1087,42 @@ namespace ElementCOMGUI
 
         #region EVENT_LOG_FUNCTIONS
 
+        #region EVENT_LOG_FILE_OUT
+
+        void AppendLogToFile(string eventString)
+        {
+            // Get current filename (based on current date)
+            string filename = "./LogFiles/ElementCOMGUILog-" + DateTime.Now.ToString("yy_MM_dd") + ".csv";
+
+            // Check if log file directory exists
+            if (!Directory.Exists("./LogFiles"))
+            {
+                // Create LogFiles directory
+                Directory.CreateDirectory("./LogFiles");
+            }
+
+            // Check if file exists
+            if (!File.Exists(filename))
+            {
+                // Create new file and close file
+                File.Create(filename).Dispose();
+            }
+
+
+            // Try to append to file
+            try
+            {
+                using (StreamWriter sw = File.AppendText(filename))
+                {
+                    sw.WriteLine(DateTime.Now.ToString("HH:mm:ss") + "," + eventString);
+                }
+            }
+            catch { }
+            
+        }
+
+        #endregion
+
         void LogCommandSent(string commandString)
         {
             switch (commandString)
@@ -1119,7 +1155,10 @@ namespace ElementCOMGUI
 
         void LogEvent(string eventString)
         {
+            // Add event to GUI event log
             EventLog.Rows.Add(String.Format("{0} {1}", DateTime.Now.ToShortDateString(), DateTime.Now.ToShortTimeString()), eventString);
+            // Add event to file event log
+            AppendLogToFile(eventString);
         }
 
         #endregion
