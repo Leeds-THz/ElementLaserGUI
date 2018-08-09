@@ -300,6 +300,13 @@ namespace ElementCOMGUI
                 prevTime = DateTime.Now;
             }
 
+            // At the start of each day, clear the COM screen and the event log
+            if (DateTime.Now.Hour == 0 && DateTime.Now.Minute == 0 && DateTime.Now.Second == 0)
+            {
+                ClearButton_Click(null, null);
+                EventLogClearButton_Click(null, null);
+            }
+
             ParseLastLine();
 
             DisplayLaserReady();
