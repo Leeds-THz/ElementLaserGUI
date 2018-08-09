@@ -1175,6 +1175,15 @@ namespace ElementCOMGUI
             AppendLogToFile(eventString);
         }
 
+
+        private void EventLogClearButton_Click(object sender, EventArgs e)
+        {
+            // Clear the event log table
+            EventLog.Rows.Clear();
+        }
+
         #endregion
+
+
     }
 }

@@ -70,6 +70,7 @@
             this.Time = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Event = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.OpenEventLogFolderButton = new System.Windows.Forms.Button();
+            this.EventLogClearButton = new System.Windows.Forms.Button();
             this.LogFileCOMGroupBox.SuspendLayout();
             this.MainCOMGroupBox.SuspendLayout();
             this.tabControl1.SuspendLayout();
@@ -437,6 +438,7 @@
             // 
             // EventLogTab
             // 
+            this.EventLogTab.Controls.Add(this.EventLogClearButton);
             this.EventLogTab.Controls.Add(this.OpenEventLogFolderButton);
             this.EventLogTab.Controls.Add(this.EventLog);
             this.EventLogTab.Location = new System.Drawing.Point(4, 22);
@@ -483,16 +485,26 @@
             this.LaserReadyLabel.Size = new System.Drawing.Size(67, 13);
             this.LaserReadyLabel.TabIndex = 1;
             this.LaserReadyLabel.Text = "Laser Ready";
-            //
+            // 
             // OpenEventLogFolderButton
             // 
-            this.OpenEventLogFolderButton.Location = new System.Drawing.Point(9, 222);
+            this.OpenEventLogFolderButton.Location = new System.Drawing.Point(311, 222);
             this.OpenEventLogFolderButton.Name = "OpenEventLogFolderButton";
             this.OpenEventLogFolderButton.Size = new System.Drawing.Size(139, 23);
             this.OpenEventLogFolderButton.TabIndex = 15;
             this.OpenEventLogFolderButton.Text = "Open Event Log Folder";
             this.OpenEventLogFolderButton.UseVisualStyleBackColor = true;
             this.OpenEventLogFolderButton.Click += new System.EventHandler(this.OpenEventLogFolderButton_Click);
+            // 
+            // EventLogClearButton
+            // 
+            this.EventLogClearButton.Location = new System.Drawing.Point(9, 222);
+            this.EventLogClearButton.Name = "EventLogClearButton";
+            this.EventLogClearButton.Size = new System.Drawing.Size(65, 23);
+            this.EventLogClearButton.TabIndex = 16;
+            this.EventLogClearButton.Text = "Clear";
+            this.EventLogClearButton.UseVisualStyleBackColor = true;
+            this.EventLogClearButton.Click += new System.EventHandler(this.EventLogClearButton_Click);
 
             // 
             // Form1
@@ -567,6 +579,7 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn Difference;
         private System.Windows.Forms.Label LaserReadyLabel;
         private System.Windows.Forms.Button OpenEventLogFolderButton;
+        private System.Windows.Forms.Button EventLogClearButton;
     }
 }
 
