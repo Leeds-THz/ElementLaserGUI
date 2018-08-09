@@ -57,6 +57,7 @@
             this.ErrorLabel = new System.Windows.Forms.Label();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.StatusTab = new System.Windows.Forms.TabPage();
+            this.LaserReadyLabel = new System.Windows.Forms.Label();
             this.StatusDisplay = new System.Windows.Forms.DataGridView();
             this.Property = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Current = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -68,7 +69,7 @@
             this.EventLog = new System.Windows.Forms.DataGridView();
             this.Time = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Event = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.LaserReadyLabel = new System.Windows.Forms.Label();
+            this.OpenEventLogFolderButton = new System.Windows.Forms.Button();
             this.LogFileCOMGroupBox.SuspendLayout();
             this.MainCOMGroupBox.SuspendLayout();
             this.tabControl1.SuspendLayout();
@@ -78,10 +79,6 @@
             this.EventLogTab.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.EventLog)).BeginInit();
             this.SuspendLayout();
-
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
-            this.MaximizeBox = false;
-
             // 
             // MainCOMPortSelector
             // 
@@ -350,6 +347,15 @@
             this.StatusTab.Text = "Status";
             this.StatusTab.UseVisualStyleBackColor = true;
             // 
+            // LaserReadyLabel
+            // 
+            this.LaserReadyLabel.AutoSize = true;
+            this.LaserReadyLabel.Location = new System.Drawing.Point(6, 3);
+            this.LaserReadyLabel.Name = "LaserReadyLabel";
+            this.LaserReadyLabel.Size = new System.Drawing.Size(67, 13);
+            this.LaserReadyLabel.TabIndex = 1;
+            this.LaserReadyLabel.Text = "Laser Ready";
+            // 
             // StatusDisplay
             // 
             this.StatusDisplay.AllowUserToAddRows = false;
@@ -365,10 +371,6 @@
             this.StatusDisplay.ReadOnly = true;
             this.StatusDisplay.Size = new System.Drawing.Size(441, 214);
             this.StatusDisplay.TabIndex = 0;
-            this.StatusDisplay.Columns[0].SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.StatusDisplay.Columns[1].SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.StatusDisplay.Columns[2].SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.StatusDisplay.Columns[3].SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             // 
             // Property
             // 
@@ -393,24 +395,6 @@
             this.Difference.HeaderText = "Difference";
             this.Difference.Name = "Difference";
             this.Difference.ReadOnly = true;
-            ///
-            /// Status rows
-            /// 
-            this.StatusDisplay.Rows.Add("Warming Up");
-            this.StatusDisplay.Rows.Add("Shutter");
-            this.StatusDisplay.Rows.Add("Power");
-            this.StatusDisplay.Rows.Add("Center WL");
-            this.StatusDisplay.Rows.Add("FWHM");
-            this.StatusDisplay.Rows.Add("User Interface Temp");
-            this.StatusDisplay.Rows.Add("Cavity Temp");
-            this.StatusDisplay.Rows.Add("Pump Laser Temp");
-            this.StatusDisplay.Rows.Add("Diagnostics Temp");
-            this.StatusDisplay.Rows.Add("4QD (532 nm) SUM");
-            this.StatusDisplay.Rows.Add("4QD (532 nm) X");
-            this.StatusDisplay.Rows.Add("4QD (532 nm) Y");
-            this.StatusDisplay.Rows.Add("4QD (800 nm) SUM");
-            this.StatusDisplay.Rows.Add("4QD (800 nm) X");
-            this.StatusDisplay.Rows.Add("4QD (800 nm) Y");
             // 
             // MainCOMOutputTab
             // 
@@ -436,6 +420,7 @@
             // 
             // EventLogTab
             // 
+            this.EventLogTab.Controls.Add(this.OpenEventLogFolderButton);
             this.EventLogTab.Controls.Add(this.EventLog);
             this.EventLogTab.Location = new System.Drawing.Point(4, 22);
             this.EventLogTab.Name = "EventLogTab";
@@ -456,10 +441,8 @@
             this.EventLog.Location = new System.Drawing.Point(9, 6);
             this.EventLog.Name = "EventLog";
             this.EventLog.ReadOnly = true;
-            this.EventLog.Size = new System.Drawing.Size(441, 236);
+            this.EventLog.Size = new System.Drawing.Size(441, 214);
             this.EventLog.TabIndex = 0;
-            this.EventLog.Columns[0].SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.EventLog.Columns[1].SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             // 
             // Time
             // 
@@ -473,14 +456,15 @@
             this.Event.Name = "Event";
             this.Event.ReadOnly = true;
             // 
-            // LaserReadyLabel
+            // OpenEventLogFolderButton
             // 
-            this.LaserReadyLabel.AutoSize = true;
-            this.LaserReadyLabel.Location = new System.Drawing.Point(6, 3);
-            this.LaserReadyLabel.Name = "LaserReadyLabel";
-            this.LaserReadyLabel.Size = new System.Drawing.Size(67, 13);
-            this.LaserReadyLabel.TabIndex = 1;
-            this.LaserReadyLabel.Text = "Laser Ready";
+            this.OpenEventLogFolderButton.Location = new System.Drawing.Point(9, 222);
+            this.OpenEventLogFolderButton.Name = "OpenEventLogFolderButton";
+            this.OpenEventLogFolderButton.Size = new System.Drawing.Size(139, 23);
+            this.OpenEventLogFolderButton.TabIndex = 15;
+            this.OpenEventLogFolderButton.Text = "Open Event Log Folder";
+            this.OpenEventLogFolderButton.UseVisualStyleBackColor = true;
+            this.OpenEventLogFolderButton.Click += new System.EventHandler(this.OpenEventLogFolderButton_Click);
             // 
             // Form1
             // 
@@ -492,6 +476,8 @@
             this.Controls.Add(this.LogFileSavePathLabel);
             this.Controls.Add(this.MainCOMGroupBox);
             this.Controls.Add(this.LogFileCOMGroupBox);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+            this.MaximizeBox = false;
             this.Name = "Form1";
             this.Text = "Element COM GUI Ver 4.2.3";
             this.LogFileCOMGroupBox.ResumeLayout(false);
@@ -553,6 +539,7 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn Reference;
         private System.Windows.Forms.DataGridViewTextBoxColumn Difference;
         private System.Windows.Forms.Label LaserReadyLabel;
+        private System.Windows.Forms.Button OpenEventLogFolderButton;
     }
 }
 

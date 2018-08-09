@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO.Ports;
 using System.Windows.Forms;
 using System.Text.RegularExpressions;
+using System.Diagnostics;
 
 namespace ElementCOMGUI
 {
@@ -1092,13 +1093,13 @@ namespace ElementCOMGUI
         void AppendLogToFile(string eventString)
         {
             // Get current filename (based on current date)
-            string filename = "./LogFiles/ElementCOMGUILog-" + DateTime.Now.ToString("yy_MM_dd") + ".csv";
+            string filename = "./EventLogFiles/ElementCOMGUILog-" + DateTime.Now.ToString("yy_MM_dd") + ".csv";
 
             // Check if log file directory exists
-            if (!Directory.Exists("./LogFiles"))
+            if (!Directory.Exists("./EventLogFiles"))
             {
                 // Create LogFiles directory
-                Directory.CreateDirectory("./LogFiles");
+                Directory.CreateDirectory("./EventLogFiles");
             }
 
             // Check if file exists
@@ -1119,6 +1120,19 @@ namespace ElementCOMGUI
             }
             catch { }
             
+        }
+
+        private void OpenEventLogFolderButton_Click(object sender, EventArgs e)
+        {
+            // Check if log file directory exists
+            if (!Directory.Exists("./EventLogFiles"))
+            {
+                // Create LogFiles directory
+                Directory.CreateDirectory("./EventLogFiles");
+            }
+            
+            // Open folder in file explorer
+            Process.Start(@".\EventLogFiles");
         }
 
         #endregion
