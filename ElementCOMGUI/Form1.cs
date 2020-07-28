@@ -10,15 +10,43 @@ namespace ElementCOMGUI
 {
     public partial class Form1 : Form
     {
-        #region VARIABLES
+		#region VARIABLES
 
-        private string[] COMList; // Array to store names of all COM ports discovered
-        private static List<string> MainCOMDataBuffer = new List<string>(); // List to store data recieved from the main COM connection
-        private static List<string> TempCOMDataBuffer = new List<string>(); // List to store data recieved from the temp COM connection
-        //private static List<string> LogFileCOMDataBuffer = new List<string>(); // List to store data recieved from the log file COM connection
-        private bool logFileWriteFlag = false; // Flag set high when log file is being written to
-        private bool autoTurnOnSentFlag = false; // Flag set high when auto turn on has been requested
-        private bool supressAutoTurnOnCheckBoxMessage = false; // Flag set high when the program is altering the state of the auto turn on check box
+		/// <summary>
+		/// Array to store names of all COM ports discovered
+		/// </summary>
+		private string[] COMList;
+
+		/// <summary>
+		/// List to store data recieved from the main COM connection
+		/// </summary>
+		private static List<string> MainCOMDataBuffer = new List<string>();
+
+		/// <summary>
+		/// List to store data recieved from the temp COM connection
+		/// </summary>
+		private static List<string> TempCOMDataBuffer = new List<string>();
+
+		//private static List<string> LogFileCOMDataBuffer = new List<string>(); // List to store data recieved from the log file COM connection
+
+		/// <summary>
+		/// Flag set high when log file is being written to
+		/// </summary>
+		private bool logFileWriteFlag = false;
+
+		/// <summary>
+		/// Flag set high when auto turn on has been requested
+		/// </summary>
+		private bool autoTurnOnSentFlag = false;
+
+		/// <summary>
+		/// Flag set high when the program is altering the state of the auto turn on check box
+		/// </summary>
+		private bool supressAutoTurnOnCheckBoxMessage = false;
+
+		/// <summary>
+		/// Stores the previous time the 'UpdateTick' function was called
+		/// </summary>
         private DateTime prevTime = DateTime.Now;
 
         #endregion
@@ -306,7 +334,8 @@ namespace ElementCOMGUI
                 ClearButton_Click(null, null);
                 EventLogClearButton_Click(null, null);
             }
-
+			
+			// Read
             ParseLastLine();
 
             DisplayLaserReady();
@@ -582,24 +611,50 @@ namespace ElementCOMGUI
 
         #region MESSAGE_PARSING_FUNCTIONS
 
+		/// <summary>
+		/// Acquires the string of the last line of a given 'TextBox'
+		/// </summary>
+		/// <param name="textBox">
+		/// 'TextBox' to acquire the last line from
+		/// </param>
+		/// <returns>
+		/// String containing the last line of the text box
+		/// If the text box is empty, an empty string is returned
+		/// </returns>
         string GetTextBoxLastLine(TextBox textBox)
         {
             var lines = TakeLastLines(textBox.Text, 2);
 
+			// If the text box is empty, return an empty string
             if (lines.Count == 0)
             {
                 return "";
             }
+			// Else return the last line
             else
             {
                 return lines[0];
             }
         }
 
+		/// <summary>
+		/// Acquires the last 'lineCount' number of lines from the given 'TextBox'
+		/// </summary>
+		/// <param name="textBox">
+		/// 'TextBox' to acquire lines from
+		/// </param>
+		/// <param name="lineCount">
+		/// Number of lines (from the end) to acquire
+		/// </param>
+		/// <returns>
+		/// A list of strings. Each item in the list is a different line from the text box
+		/// If the text box is empty, 'null' is returned
+		/// </returns>
         List<string> GetTextBoxLastLines(TextBox textBox, int lineCount)
         {
             var lines = TakeLastLines(textBox.Text, lineCount + 1);
 
+			// If the text box is empty, null is returned
             if (lines.Count == 0)
             {
                 return null;
@@ -613,9 +668,16 @@ namespace ElementCOMGUI
         /// <summary>
         /// Retrieves the last n lines from a multiline string. Code taken from "https://stackoverflow.com/questions/11942885/take-the-last-n-lines-of-a-string-c-sharp"
         /// </summary>
-        /// <param name="text"></param>
-        /// <param name="count"></param>
-        /// <returns></returns>
+        /// <param name="text">
+		/// Multiline string to be parsed
+		/// </param>
+        /// <param name="count">
+		/// Number of lines to acquire (begining at the end of the string)
+		/// </param>
+        /// <returns>
+		/// A list of strings containing the last 'count' number of lines from the end of the string. Each element of the list is a separate line.
+		/// If the text is empty, an empty list is returned.
+		/// </returns>
         private static List<string> TakeLastLines(string text, int count)
         {
             List<string> lines = new List<string>();
@@ -629,49 +691,74 @@ namespace ElementCOMGUI
 
             return lines;
         }
-
+		
+		/// <summary>
+		/// Reads the last line of the COM output and update the display based on the text
+		/// </summary>
         void ParseLastLine()
         {
-            // Read last line of COMOUT
+            // Read last line of the COM output textbox
             string lastLine = GetTextBoxLastLine(COMOut);
 
-            DisplayLogFileTimeRemaining(lastLine);
+			// Display the logfile acquisition time remaining (will only display if correct text is received)
+			DisplayLogFileTimeRemaining(lastLine);
 
             CheckStatus();
         }
 
         #region LOGFILE_TIME_ESTIMATOR
-
+		
+		/// <summary>
+		/// Parses the given string 'logLine' and finds out how many seconds remain of the given request.
+		/// Used when laser log file is acquired.
+		/// </summary>
+		/// <param name="logLine">
+		/// String to be parsed
+		/// </param>
+		/// <returns>
+		/// Number of seconds remaining, as parsed by 'logLine'
+		/// </returns>
         int LogfileTransferSecondsRemaining(string logLine)
         {
             // Logline in format "LOGFILE N BYTES REMAINING"
             string pattern = @"\d+(?= BYTES REMAINING)";
-            Match match = Regex.Match(logLine, pattern);
+            Match match = Regex.Match(logLine, pattern); // Regex using the pattern above to extract the number of bytes remaining
 
             int secondsRemaining = 0;
-
+			
+			// Make sure only 1 number was extracted and then convert the number string into an int
             if (match.Captures.Count == 1 && int.TryParse(match.Value, out int bytesRemaining))
             {
+				// Rough calculation to convert bytes remaining into seconds (based on the baud rate I think?)
                 secondsRemaining = bytesRemaining / 10000;
             }
 
-
+			// Return the number of seconds left
             return secondsRemaining;
         }
-
+		
+		/// <summary>
+		/// Display the text showing the time remaining for the log file acquisition
+		/// </summary>
+		/// <param name="lastLine">
+		/// String of the last line from the COM output
+		/// </param>
         void DisplayLogFileTimeRemaining(string lastLine)
         {
-            int secondsRemaining = LogfileTransferSecondsRemaining(lastLine);
-
+			// Convert the "LOGFILE N BYTES REMAINING" string into seconds remaining
+			int secondsRemaining = LogfileTransferSecondsRemaining(lastLine);
+			
+			// If the action has finished (0 seconds remaining), hide the text
             if (secondsRemaining == 0)
             {
                 LogfileTransferTimeLabel.Hide();
             }
+			// Else show the time remaining
             else
             {
-                LogfileTransferTimeLabel.Show();
+                LogfileTransferTimeLabel.Show(); // Unhide text
 
-                LogfileTransferTimeLabel.Text = String.Format("File Transfer Time Remaining:\n{0} Second(s)", secondsRemaining);
+                LogfileTransferTimeLabel.Text = String.Format("File Transfer Time Remaining:\n{0} Second(s)", secondsRemaining); // Set text to be displayed
             }
         }
 
@@ -681,42 +768,71 @@ namespace ElementCOMGUI
 
         #region LASER_READY_CHECKING
 
+		/// <summary>
+		/// Updates the text label indicating if the laser is ready or not.
+		/// </summary>
         void DisplayLaserReady()
         {
+			// Check the state of the laser from the last check
             var prevState = PrevLaserReady();
 
+			// If the laser is ready
             if (IsLaserReady())
             {
+				// Update the label text
                 LaserReadyLabel.Text = "Laser Ready!";
+				// Update the label text colour
                 LaserReadyLabel.ForeColor = System.Drawing.Color.Green;
 
+				// If there has been a change of state since the last check
                 if (!prevState)
                 {
+					// Log the event
                     LogEvent("Laser ready");
                 }
             }
+			// Laser is not ready
             else
             {
-                LaserReadyLabel.Text = "Laser Not Ready!";
-                LaserReadyLabel.ForeColor = System.Drawing.Color.Red;
+				// Update the label text
+				LaserReadyLabel.Text = "Laser Not Ready!";
+				// Update the label text colour
+				LaserReadyLabel.ForeColor = System.Drawing.Color.Red;
 
-                if (prevState)
+				// If there has been a change of state since the last check
+				if (prevState)
                 {
-                    LogEvent("Laser not ready");
+					// Log the event
+					LogEvent("Laser not ready");
                 }
             }
         }
 
+		/// <summary>
+		/// Checks the state of the laser as acquired by the last check
+		/// This is done by reading the text of the 'LaserReadyLabel'
+		/// </summary>
+		/// <returns>
+		/// True if the laser was ready during the last check
+		/// False if the laser was not ready during the last check
+		/// </returns>
         bool PrevLaserReady()
         {
-            if (LaserReadyLabel.Text == "Laser Ready!")
-            {
-                return true;
-            }
-
-            return false;
+			return (LaserReadyLabel.Text == "Laser Ready!");
         }
 
+		/// <summary>
+		/// Checks if the laser is ready
+		/// All information is acquired through the element status get command
+		/// The laser is defined to be ready under the following conditions:
+		///		- Warming Up = NO
+		///		- Power is +/- 10mW off the target power
+		///		- Center Wavelength is +/- 10nm off the target wavelength
+		///		- FWHM is +/- 10nm off the target FWHM
+		/// </summary>
+		/// <returns>
+		/// True if the laser is determined to be ready, false otherwise
+		/// </returns>
         bool IsLaserReady()
         {
             // If |Power diff| < 10 and |CWL| < 10 and |FWHM| < 10 and Warm Up == NO
@@ -725,31 +841,69 @@ namespace ElementCOMGUI
             var CWLDiffString = GetStatusCell("Center WL", 3);
             var FWHMDiffString = GetStatusCell("FWHM", 3);
 
+			/*
             if (warmUpString == "NO" && StringAbsValueInLimits(powerDiffString, 10) && StringAbsValueInLimits(CWLDiffString, 10) && StringAbsValueInLimits(FWHMDiffString, 10))
             {
                 return true;
             }
 
             return false;
+			*/
+
+			return (warmUpString == "NO" && StringAbsValueInLimits(powerDiffString, 10) && StringAbsValueInLimits(CWLDiffString, 10) && StringAbsValueInLimits(FWHMDiffString, 10));
         }
 
-        bool StringAbsValueInLimits(string value, int threshold)
+		/// <summary>
+		/// Acquires a number from a string and checks its absolute value is lower than the given 'threshold'
+		/// Absolute value acquired by ignoring any sign infront of the number string
+		/// </summary>
+		/// <param name="value">
+		/// String containing the number to be checked
+		/// </param>
+		/// <param name="threshold">
+		/// Maximum value |'value'| can be for the function to return true
+		/// </param>
+		/// <returns>
+		/// True if threshold >= |'value'| 
+		/// </returns>
+		bool StringAbsValueInLimits(string value, int threshold)
         {
+			// Acquire the number from the string, ignoring the sign
             var numString = RegexSingleGroupMatch(value, @"(\d+)");
+
+			// If a number was acquired
             if (numString != "")
             {
+				// Convert it to an integer
                 int intValue = int.Parse(numString);
 
+
+				/*
                 if (intValue <= threshold)
                 {
                     return true;
                 }
+				*/
+
+				// Check that the value is less than or equal to the threshold
+				return (intValue <= threshold);
             }
 
             return false;
-
         }
-
+		
+		/// <summary>
+		/// Gets the status of the given property and the given column
+		/// </summary>
+		/// <param name="property">
+		/// Property to get the value from
+		/// </param>
+		/// <param name="column">
+		/// Column to get the value from
+		/// </param>
+		/// <returns>
+		/// Gets the string from the laser status table from the given column of the given property
+		/// </returns>
         string GetStatusCell(string property, int column)
         {
             // Get index
@@ -764,19 +918,33 @@ namespace ElementCOMGUI
         }
 
         #endregion
-
+		
+		/// <summary>
+		/// Read the last 50 COM output lines recieved and update the laser status accordingly
+		/// </summary>
         void CheckStatus()
         {
+			// Get the last 50 lines from the COM output
             var lastLines = GetTextBoxLastLines(COMOut, 50);
-
+			
+			// Iterate through each line
             foreach (var line in lastLines)
             {
+				// Parse the line and update the relevant field
                 CheckStatusLine(line);
             }
         }
-
+		
+		/// <summary>
+		/// Parse the given line and update the relevant field
+		/// </summary>
+		/// <param name="logLine">
+		/// String to be parsed
+		/// </param>
         void CheckStatusLine(string logLine)
         {
+			// NOTE: Could probably speed things up here be returning from the function if a Regex was successful. 
+			// Would require all functions to return a bool representing if the field was updated or not and a few if statements.
             WarmUpDisplay(logLine);
             ShutterDisplay(logLine);
             PowerDisplay(logLine);
@@ -793,26 +961,52 @@ namespace ElementCOMGUI
             PUMPTempDisplay(logLine);
             DIAGTempDisplay(logLine);
         }
-
+		
+		/// <summary>
+		/// Get the index of the property named 'propertyString' in 'StatusDisplay' (the table showing the laser status).
+		/// Used when setting the value of a property in the table.
+		/// </summary>
+		/// <param name="propertyString">
+		/// Property to find the index of
+		/// </param>
+		/// <returns>
+		/// Index of the property 'propertyString' in the table 'StatusDisplays'. If the property is not found, -1 is returned.
+		/// </returns>
         int GetStatusRowPropertyIndex(string propertyString)
         {
+			// Iterate through the table
             for (int i = 0; i < StatusDisplay.Rows.Count; i++)
             {
+				// If the property matches the property we are looking for
                 if (StatusDisplay.Rows[i].Cells[0].Value == propertyString)
                 {
+					// Return the index of the property (current index)
                     return i;
                 }
             }
+
+			// Property was not found, return -1
             return -1;
         }
 
+		/// <summary>
+		/// Sets the status of the given property in the laser status table
+		/// </summary>
+		/// <param name="property">
+		/// Property to be updated (e.g. element power)
+		/// </param>
+		/// <param name="status">
+		/// Value to assign to the property (e.g. 720mW)
+		/// </param>
         void SetStatus(string property, string status)
         {
+			// If a valid status string is given
             if (status != "")
             {
                 // Get index
                 var propertyIndex = GetStatusRowPropertyIndex(property);
-
+				
+				// If property could not be found, return
                 if (propertyIndex == -1)
                 {
                     return;
@@ -822,20 +1016,31 @@ namespace ElementCOMGUI
                 StatusDisplay.Rows[propertyIndex].Cells[1].Value = status;
             }
         }
-
+		
+		/// <summary>
+		/// Sets a list of statuses to the given property
+		/// </summary>
+		/// <param name="property">
+		/// Property to be updated
+		/// </param>
+		/// <param name="status">
+		/// Values to be assigned to the property
+		/// </param>
         void SetStatus(string property, List<string> status)
         {
+			// Check if a valid list of status have been given
             if (status != null)
             {
                 // Get index
                 var propertyIndex = GetStatusRowPropertyIndex(property);
-
-                if (propertyIndex == -1)
+				
+				// If property could not be found, return
+				if (propertyIndex == -1)
                 {
                     return;
                 }
 
-                // Set status
+                // Set each status in the status list
                 for (int i = 0; i < status.Count; i++)
                 {
                     StatusDisplay.Rows[propertyIndex].Cells[i+1].Value = status[i];
@@ -843,7 +1048,19 @@ namespace ElementCOMGUI
                 
             }
         }
-
+		
+		/// <summary>
+		/// Acquires a single group from a regex match
+		/// </summary>
+		/// <param name="line">
+		/// Line to be parsed
+		/// </param>
+		/// <param name="regex">
+		/// Regex equation to apply to the line
+		/// </param>
+		/// <returns>
+		/// A string of the required regex group
+		/// </returns>
         string RegexSingleGroupMatch(string line, string regex)
         {
             if (line != null)
@@ -857,7 +1074,22 @@ namespace ElementCOMGUI
             }
             return "";
         }
-
+		
+		/// <summary>
+		/// Acquires 'groupCount' groups from a regex match
+		/// </summary>
+		/// <param name="line">
+		/// Line to be parsed
+		/// </param>
+		/// <param name="regex">
+		/// Regex equation to apply to the line
+		/// </param>
+		/// <param name="groupCount">
+		/// Number of groups to acquire
+		/// </param>
+		/// <returns>
+		/// List of strings, each index being a separate group acquired by the regex function
+		/// </returns>
         List<string> RegexMultiGroupMatch(string line, string regex, int groupCount)
         {
             if (line != null)
@@ -878,7 +1110,13 @@ namespace ElementCOMGUI
             }
             return null;
         }
-
+		
+		/// <summary>
+		/// Attempt to parse the 'WARM UP' status
+		/// </summary>
+		/// <param name="logLine">
+		/// Log line to be parsed
+		/// </param>
         void WarmUpDisplay(string logLine)
         {
             var status = RegexSingleGroupMatch(logLine, @"WARM UP;(\w+);");
@@ -886,98 +1124,182 @@ namespace ElementCOMGUI
             SetStatus("Warming Up", status);
         }
 
-        void ShutterDisplay(string logLine)
+		/// <summary>
+		/// Attempt to parse the 'SHUTTER' status
+		/// </summary>
+		/// <param name="logLine">
+		/// Log line to be parsed
+		/// </param>		
+		void ShutterDisplay(string logLine)
         {
             var status = RegexSingleGroupMatch(logLine, @"SHUTTER;(\w+);");
 
             SetStatus("Shutter", status);
         }
 
-        void PowerDisplay(string logLine)
+		/// <summary>
+		/// Attempt to parse the 'P 800 CAL' status (element power)
+		/// </summary>
+		/// <param name="logLine">
+		/// Log line to be parsed
+		/// </param>
+		void PowerDisplay(string logLine)
         {
             var status = RegexMultiGroupMatch(logLine, @"P 800 CAL;\s*(-?\d+)\s*mW;\s*(-?\d+)\s*mW;\s*(-?\d+)\s*mW;", 3);
 
             SetStatus("Power", status);
         }
 
-        void CenterWLDisplay(string logLine)
+		/// <summary>
+		/// Attempt to parse the 'CENTER WL' status
+		/// </summary>
+		/// <param name="logLine">
+		/// Log line to be parsed
+		/// </param>
+		void CenterWLDisplay(string logLine)
         {
             var status = RegexMultiGroupMatch(logLine, @"CENTER WL;\s*(-?\d+)\s*nm;\s*(-?\d+)\s*nm;\s*(-?\d+)\s*nm;", 3);
 
             SetStatus("Center WL", status);
         }
 
-        void FWHMDisplay(string logLine)
+		/// <summary>
+		/// Attempt to parse the 'FWHM' status
+		/// </summary>
+		/// <param name="logLine">
+		/// Log line to be parsed
+		/// </param>
+		void FWHMDisplay(string logLine)
         {
             var status = RegexMultiGroupMatch(logLine, @"FWHM  800;\s*(-?\d+)\s*nm;\s*(-?\d+)\s*nm;\s*(-?\d+)\s*nm;", 3);
 
             SetStatus("FWHM", status);
         }
 
-        void QD1SUMDisplay(string logLine)
+		/// <summary>
+		/// Attempt to parse the '4QD 1 SUM' status
+		/// </summary>
+		/// <param name="logLine">
+		/// Log line to be parsed
+		/// </param>
+		void QD1SUMDisplay(string logLine)
         {
             var status = RegexMultiGroupMatch(logLine, @"4QD  1  SUM;\s*(-?\+?\d+)\s*;\s*(-?\+?\d+)\s*;\s*(-?\+?\d+)\s*;", 3);
 
             SetStatus("4QD (532 nm) SUM", status);
         }
 
-        void QD1XDisplay(string logLine)
+		/// <summary>
+		/// Attempt to parse the '4 QD 1 X' status
+		/// </summary>
+		/// <param name="logLine">
+		/// Log line to be parsed
+		/// </param>
+		void QD1XDisplay(string logLine)
         {
             var status = RegexMultiGroupMatch(logLine, @"4QD  1  X;\s*(-?\+?\d+)\s*;\s*(-?\+?\d+)\s*;\s*(-?\+?\d+)\s*;", 3);
 
             SetStatus("4QD (532 nm) X", status);
         }
 
-        void QD1YDisplay(string logLine)
+		/// <summary>
+		/// Attempt to parse the '4 QD 1 Y' status
+		/// </summary>
+		/// <param name="logLine">
+		/// Log line to be parsed
+		/// </param>
+		void QD1YDisplay(string logLine)
         {
             var status = RegexMultiGroupMatch(logLine, @"4QD  1  Y;\s*(-?\+?\d+)\s*;\s*(-?\+?\d+)\s*;\s*(-?\+?\d+)\s*;", 3);
 
             SetStatus("4QD (532 nm) Y", status);
         }
 
-        void QD3SUMDisplay(string logLine)
+		/// <summary>
+		/// Attempt to parse the '4 QD 3 SUM' status
+		/// </summary>
+		/// <param name="logLine">
+		/// Log line to be parsed
+		/// </param>
+		void QD3SUMDisplay(string logLine)
         {
             var status = RegexMultiGroupMatch(logLine, @"4QD  3  SUM;\s*(-?\d+)\s*;\s*(-?\d+)\s*;\s*(-?\d+)\s*;", 3);
 
             SetStatus("4QD (800 nm) SUM", status);
         }
 
-        void QD3XDisplay(string logLine)
+		/// <summary>
+		/// Attempt to parse the '4 QD 3 X' status
+		/// </summary>
+		/// <param name="logLine">
+		/// Log line to be parsed
+		/// </param>
+		void QD3XDisplay(string logLine)
         {
             var status = RegexMultiGroupMatch(logLine, @"4QD  3  X;\s*(-?\+?\d+)\s*;\s*(-?\+?\d+)\s*;\s*(-?\+?\d+)\s*;", 3);
 
             SetStatus("4QD (800 nm) X", status);
         }
 
-        void QD3YDisplay(string logLine)
+		/// <summary>
+		/// Attempt to parse the '4 QD 3 Y' status
+		/// </summary>
+		/// <param name="logLine">
+		/// Log line to be parsed
+		/// </param>
+		void QD3YDisplay(string logLine)
         {
             var status = RegexMultiGroupMatch(logLine, @"4QD  3  Y;\s*(-?\+?\d+)\s*;\s*(-?\+?\d+)\s*;\s*(-?\+?\d+)\s*;", 3);
 
             SetStatus("4QD (800 nm) Y", status);
         }
 
-        void USRITempDisplay(string logLine)
+		/// <summary>
+		/// Attempt to parse the 'TEMP USRI' status
+		/// </summary>
+		/// <param name="logLine">
+		/// Log line to be parsed
+		/// </param>
+		void USRITempDisplay(string logLine)
         {
             var status = RegexMultiGroupMatch(logLine, @"TEMP USRI;\s*(-?\+?\d+.?\d*)\s*;\s*(-?\+?\d+.?\d*)\s*;\s*(-?\+?\d+.?\d*)\s*;", 3);
 
             SetStatus("User Interface Temp", status);
         }
 
-        void CAVITempDisplay(string logLine)
+		/// <summary>
+		/// Attempt to parse the 'TEMP CAVI' status
+		/// </summary>
+		/// <param name="logLine">
+		/// Log line to be parsed
+		/// </param>
+		void CAVITempDisplay(string logLine)
         {
             var status = RegexMultiGroupMatch(logLine, @"TEMP CAVI;\s*(-?\+?\d+.?\d*)\s*;\s*(-?\+?\d+.?\d*)\s*;\s*(-?\+?\d+.?\d*)\s*;", 3);
 
             SetStatus("Cavity Temp", status);
         }
 
-        void PUMPTempDisplay(string logLine)
+		/// <summary>
+		/// Attempt to parse the 'TEMP PUMP' status
+		/// </summary>
+		/// <param name="logLine">
+		/// Log line to be parsed
+		/// </param>
+		void PUMPTempDisplay(string logLine)
         {
             var status = RegexMultiGroupMatch(logLine, @"TEMP PUMP;\s*(-?\+?\d+.?\d*)\s*;\s*(-?\+?\d+.?\d*)\s*;\s*(-?\+?\d+.?\d*)\s*;", 3);
 
             SetStatus("Pump Laser Temp", status);
         }
 
-        void DIAGTempDisplay(string logLine)
+		/// <summary>
+		/// Attempt to parse the 'TEMP DIAG' status
+		/// </summary>
+		/// <param name="logLine">
+		/// Log line to be parsed
+		/// </param>
+		void DIAGTempDisplay(string logLine)
         {
             var status = RegexMultiGroupMatch(logLine, @"TEMP DIAG;\s*(-?\+?\d+.?\d*)\s*;\s*(-?\+?\d+.?\d*)\s*;\s*(-?\+?\d+.?\d*)\s*;", 3);
 
@@ -990,52 +1312,85 @@ namespace ElementCOMGUI
 
         #region AUTO_TURN_ON_FUNCTIONS
 
+		/// <summary>
+		/// Function called when the value of the auto turn on picker changes
+		/// Function currently does nothing
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
         private void AutoTurnOnTimePicker_ValueChanged(object sender, EventArgs e)
         {
             //MessageBox.Show(AutoTurnOnTimePicker.Value.TimeOfDay.ToString());
             //AutoTurnOnTimePicker.Value.Second = 0;
         }
 
+		/// <summary>
+		/// Function called when the auto turn on check box value is changed
+		/// If the box is ticked, the auto turn on time picker will become locked and the laser will be set to automatically turn on at the given time
+		/// If the box is unticked, the laser auto turn on will be disabled
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
         private void AutoTurnOnCheckBox_CheckedChanged(object sender, EventArgs e)
         {
-            if (!supressAutoTurnOnCheckBoxMessage)
+			// If the user is interacting with the check box
+			//		(Check is perfomed using the 'supressAutoTurnOnCheckBoxMessage' flag. It prevents the auto turn on enabled/disabled popups from appearing when the program is automatically enabling/disabling the check box)
+			if (!supressAutoTurnOnCheckBoxMessage)
             {
                 // Clear any error messages
                 ClearErrorLabelMessage();
 
+				// If the box is checked
                 if (AutoTurnOnCheckBox.Checked)
                 {
-                    
+                    // If there isn't a COM connection to the laser
                     if (!MainCOMPort.IsOpen)
                     {
+						// Display an error message
                         SetErrorLabelMessage("Main COM port not connected");
+						// Disable auto turn on pop up
                         supressAutoTurnOnCheckBoxMessage = true;
+						// Disable the check box
                         AutoTurnOnCheckBox.Checked = false;
                         return;
                     }
                     
-
+					// Log the auto turn on being set as an event
                     LogEvent("Element set to turn on at " + AutoTurnOnTimePicker.Value.ToShortTimeString());
-                    //AutoTurnOnTimePicker.Hide();
+					// Disable user control to the time picker (done to prevent accidently changing the auto turn on time after it is set)
                     AutoTurnOnTimePicker.Enabled = false;
+					// Show a pop up box stating the auto turn on time
                     MessageBox.Show("The Element will automatically be turned on at " + AutoTurnOnTimePicker.Value.ToShortTimeString());
                 }
+				// Box is unchecked
                 else
                 {
+					// Log the auto turn on being unset as an event
                     LogEvent("Element auto turn on unset");
-                    //AutoTurnOnTimePicker.Show();
+					// Allow for the user to change the auto turn on time using the picker
                     AutoTurnOnTimePicker.Enabled = true;
+					// Show a pop up box stating that ther auto turn on has been unset
                     MessageBox.Show("The Element will not automatically be turned on");
                 }
             }
+			// If the code reaches here, the program has automatically change the check box state
             else
             {
+				// Disable the popup flag
                 supressAutoTurnOnCheckBoxMessage = false;
             }
 
+			// Reset the auto turn on flag
             autoTurnOnSentFlag = false;
         }
 
+		/// <summary>
+		/// Checks if an auto turn on should be performed
+		///	Auto turn on is performed if the auto turn box is set and the current 'DateTime' matches the 'DateTime' of the auto turn on picker
+		/// </summary>
+		/// <returns>
+		/// True if an auto turn on should be performed, false otherwise
+		/// </returns>
         private bool AutoTurnOnChecker()
         {
             if (AutoTurnOnCheckBox.Checked)
@@ -1046,7 +1401,6 @@ namespace ElementCOMGUI
                 if (curTime == autoTurnOnTime)
                 {
                     AutoTurnOnTimePicker.Enabled = true;
-                    //AutoTurnOnTimePicker.Show();
                     return true;
                 }
             }
@@ -1054,8 +1408,12 @@ namespace ElementCOMGUI
             return false;
         }
 
+		/// <summary>
+		/// Attempts to send a turn on command to the laser
+		/// </summary>
         private void SendTurnOnCommand()
         {
+			// If there is a COM connection to the laser
             if (MainCOMPort.IsOpen)
             {
                 // Send the command over the main COM port
@@ -1063,30 +1421,47 @@ namespace ElementCOMGUI
             }
         }
 
+		/// <summary>
+		/// Performs an auto turn on if one should be performed 
+		/// </summary>
         private void AutoTurnOn()
         {
+			// Check if a auto turn on should be performed
             var turnOn = AutoTurnOnChecker();
 
+			// If an auto turn on has not already been requested and an auto turn on should be perfomed
             if (!autoTurnOnSentFlag && turnOn)
             {
+				// Supress check box change messages
                 supressAutoTurnOnCheckBoxMessage = true;
 
+				// If there is a COM connection to the laser
                 if (MainCOMPort.IsOpen)
                 {
+					// Send a turn on command
                     SendTurnOnCommand();
 
+					// Set the auto turn on flag to high, as a auto turn on has been requested
                     autoTurnOnSentFlag = true;
 
+					// Disable the auto turn on check box
                     AutoTurnOnCheckBox.Checked = false;
 
+					// Log that an auto turn on request has been sent
                     LogEvent("Auto turn on request sent");
+
+					// Display a text box stating that the element has been automatically turned on
                     MessageBox.Show("The Element was automatically turned on at " + DateTime.Now.ToShortTimeString());
                 }
+				// There is no COM connection to the laser
                 else
                 {
+					// Display an error message
                     SetErrorLabelMessage("Main COM port not connected");
-                    LogEvent("Auto turn on failed (Main COM port not connected)");
-                    AutoTurnOnCheckBox.Checked = false;
+					// Log that the auto turn on failed
+					LogEvent("Auto turn on failed (Main COM port not connected)");
+					// Disable the check box
+					AutoTurnOnCheckBox.Checked = false;
                 }
             }
         }
@@ -1097,6 +1472,13 @@ namespace ElementCOMGUI
 
         #region EVENT_LOG_FILE_OUT
 
+		/// <summary>
+		/// Appends the event to the current log file
+		/// New log file generated each day
+		/// </summary>
+		/// <param name="eventString">
+		/// Text to be added to the log file
+		/// </param>
         void AppendLogToFile(string eventString)
         {
             // Get current filename (based on current date)
@@ -1129,6 +1511,11 @@ namespace ElementCOMGUI
             
         }
 
+		/// <summary>
+		/// Opens the directory containing the log files in windows file explorer when the 'OpenEventLogFolder' button is pressed
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
         private void OpenEventLogFolderButton_Click(object sender, EventArgs e)
         {
             // Check if log file directory exists
@@ -1144,12 +1531,19 @@ namespace ElementCOMGUI
 
         #endregion
 
+		/// <summary>
+		/// Logs the given event to the log file and to the GUI
+		/// Status acquisition commands are hidden in the GUI. This is so it doesn't get clogged up by the automatic status requests sent every minute
+		/// </summary>
+		/// <param name="commandString">
+		/// Command to be logged
+		/// </param>
         void LogCommandSent(string commandString)
         {
             switch (commandString)
             {
                 case "STATUS=?":
-                    LogEvent("Status request sent");
+                    LogEvent("Status request sent", false); // Hides the event in the GUI to prevent visual clogging
                     break;
                 case "STARTLSR=1":
                     LogEvent("Laser turn on request sent");
@@ -1174,15 +1568,33 @@ namespace ElementCOMGUI
             }
         }
 
-        void LogEvent(string eventString)
+		/// <summary>
+		/// Logs the given event string in the log file and (if 'showInGUI' is true) in the GUI event log
+		/// </summary>
+		/// <param name="eventString">
+		/// String to be logged
+		/// </param>
+		/// <param name="showInGUI">
+		/// When 'true', the string will be logged in the GUI and the log file
+		/// When 'false', the string will only by logged in the log file
+		/// Default value of 'true'
+		/// </param>
+		void LogEvent(string eventString, bool showInGUI = true)
         {
-            // Add event to GUI event log
-            EventLog.Rows.Add(String.Format("{0} {1}", DateTime.Now.ToShortDateString(), DateTime.Now.ToShortTimeString()), eventString);
+			// Add event to GUI event log
+			if (showInGUI)
+			{
+				EventLog.Rows.Add(String.Format("{0} {1}", DateTime.Now.ToShortDateString(), DateTime.Now.ToShortTimeString()), eventString);
+			}
             // Add event to file event log
             AppendLogToFile(eventString);
         }
 
-
+		/// <summary>
+		/// Clears the event log when the 'EventLogClear' button is pressed
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
         private void EventLogClearButton_Click(object sender, EventArgs e)
         {
             // Clear the event log table
