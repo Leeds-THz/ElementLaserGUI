@@ -1356,21 +1356,23 @@ namespace ElementCOMGUI
                     }
                     
 					// Log the auto turn on being set as an event
-                    LogEvent("Element set to turn on at " + AutoTurnOnTimePicker.Value.ToShortTimeString());
-					// Disable user control to the time picker (done to prevent accidently changing the auto turn on time after it is set)
+                    LogEvent("Element set to turn on at " + AutoTurnOnTimePicker.Value.ToShortTimeString() + " " + AutoTurnOnDatePicker.Value.ToShortDateString());
+					// Disable user control to the time and date pickers (done to prevent accidently changing the auto turn on time after it is set)
                     AutoTurnOnTimePicker.Enabled = false;
+					AutoTurnOnDatePicker.Enabled = false;
 					// Show a pop up box stating the auto turn on time
-                    MessageBox.Show("The Element will automatically be turned on at " + AutoTurnOnTimePicker.Value.ToShortTimeString());
+                    MessageBox.Show("The Element will automatically be turned on at " + AutoTurnOnTimePicker.Value.ToShortTimeString() + " " + AutoTurnOnDatePicker.Value.ToShortDateString());
                 }
 				// Box is unchecked
                 else
                 {
 					// Log the auto turn on being unset as an event
                     LogEvent("Element auto turn on unset");
-					// Allow for the user to change the auto turn on time using the picker
+					// Allow for the user to change the auto turn on time and date using the pickers
                     AutoTurnOnTimePicker.Enabled = true;
+					AutoTurnOnDatePicker.Enabled = true;
 					// Show a pop up box stating that ther auto turn on has been unset
-                    MessageBox.Show("The Element will not automatically be turned on");
+					MessageBox.Show("The Element will not automatically be turned on");
                 }
             }
 			// If the code reaches here, the program has automatically change the check box state
@@ -1393,14 +1395,21 @@ namespace ElementCOMGUI
 		/// </returns>
         private bool AutoTurnOnChecker()
         {
+			// If the auto turn on is enabled
             if (AutoTurnOnCheckBox.Checked)
             {
+				// Get the current time and date strings
                 var curTime = DateTime.Now.ToShortTimeString();
-                var autoTurnOnTime = AutoTurnOnTimePicker.Value.ToShortTimeString();
+				var curDate = DateTime.Now.ToShortDateString();
 
-                if (curTime == autoTurnOnTime)
+				// Get the auto turn on date and time
+                var autoTurnOnTime = AutoTurnOnTimePicker.Value.ToShortTimeString();
+				var autoTurnOnDate = AutoTurnOnDatePicker.Value.ToShortDateString();
+
+                if (curDate == autoTurnOnDate && curTime == autoTurnOnTime)
                 {
                     AutoTurnOnTimePicker.Enabled = true;
+					AutoTurnOnDatePicker.Enabled = true;
                     return true;
                 }
             }

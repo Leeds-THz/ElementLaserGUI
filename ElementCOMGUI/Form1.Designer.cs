@@ -71,6 +71,7 @@
 			this.EventLog = new System.Windows.Forms.DataGridView();
 			this.Time = new System.Windows.Forms.DataGridViewTextBoxColumn();
 			this.Event = new System.Windows.Forms.DataGridViewTextBoxColumn();
+			this.AutoTurnOnDatePicker = new System.Windows.Forms.DateTimePicker();
 			this.LogFileCOMGroupBox.SuspendLayout();
 			this.MainCOMGroupBox.SuspendLayout();
 			this.tabControl1.SuspendLayout();
@@ -234,6 +235,7 @@
 			// 
 			// MainCOMGroupBox
 			// 
+			this.MainCOMGroupBox.Controls.Add(this.AutoTurnOnDatePicker);
 			this.MainCOMGroupBox.Controls.Add(this.AutoTurnOnCheckBox);
 			this.MainCOMGroupBox.Controls.Add(this.AutoTurnOnTimePicker);
 			this.MainCOMGroupBox.Controls.Add(this.MainDisconnectButton);
@@ -478,6 +480,15 @@
 			this.Event.Name = "Event";
 			this.Event.ReadOnly = true;
 			// 
+			// AutoTurnOnDatePicker
+			// 
+			this.AutoTurnOnDatePicker.CustomFormat = "ddd d/MM";
+			this.AutoTurnOnDatePicker.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
+			this.AutoTurnOnDatePicker.Location = new System.Drawing.Point(206, 165);
+			this.AutoTurnOnDatePicker.Name = "AutoTurnOnDatePicker";
+			this.AutoTurnOnDatePicker.Size = new System.Drawing.Size(99, 20);
+			this.AutoTurnOnDatePicker.TabIndex = 15;
+			// 
 			// Form1
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -553,6 +564,7 @@
         private System.Windows.Forms.Label LaserReadyLabel;
         private System.Windows.Forms.Button OpenEventLogFolderButton;
         private System.Windows.Forms.Button EventLogClearButton;
-    }
+		private System.Windows.Forms.DateTimePicker AutoTurnOnDatePicker;
+	}
 }
 
