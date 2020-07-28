@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27004.2009
+VisualStudioVersion = 15.0.26430.12
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ElementCOMGUI", "ElementCOMGUI\ElementCOMGUI.csproj", "{E5CCA6CA-8EC7-4A8B-9FBB-118072DE7D03}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ElementLaserGUI", "ElementLaserGUI\ElementLaserGUI.csproj", "{E5CCA6CA-8EC7-4A8B-9FBB-118072DE7D03}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -6,7 +6,7 @@ using System.Windows.Forms;
 using System.Text.RegularExpressions;
 using System.Diagnostics;
 
-namespace ElementCOMGUI
+namespace ElementLaserGUI
 {
     public partial class Form1 : Form
     {

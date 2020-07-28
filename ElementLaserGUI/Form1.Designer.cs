@@ -1,4 +1,4 @@
-﻿namespace ElementCOMGUI
+﻿namespace ElementLaserGUI
 {
     partial class Form1
     {
