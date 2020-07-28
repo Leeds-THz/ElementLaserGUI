@@ -27,7 +27,12 @@ namespace ElementCOMGUI
 		/// </summary>
 		private static List<string> TempCOMDataBuffer = new List<string>();
 
-		//private static List<string> LogFileCOMDataBuffer = new List<string>(); // List to store data recieved from the log file COM connection
+		/// <summary>
+		/// Stores the previous time the 'UpdateTick' function was called
+		/// </summary>
+        private DateTime prevTime = DateTime.Now;
+
+		#region FLAGS
 
 		/// <summary>
 		/// Flag set high when log file is being written to
@@ -45,18 +50,21 @@ namespace ElementCOMGUI
 		private bool supressAutoTurnOnCheckBoxMessage = false;
 
 		/// <summary>
-		/// Stores the previous time the 'UpdateTick' function was called
+		/// Flag set high when an auto turn on is performed. Flag set to low when auto turn on dialog is closed.
+		/// Used as a safety feature to automatically turn the laser off if there is no user input within a set amount of time.
 		/// </summary>
-        private DateTime prevTime = DateTime.Now;
+		private bool AutoTurnOffFlag = false;
 
-        #endregion
+		#endregion
 
-        #region CONSTRUCTOR
+		#endregion
 
-        /// <summary>
-        /// Form Constructor
-        /// </summary>
-        public Form1()
+		#region CONSTRUCTOR
+
+		/// <summary>
+		/// Form Constructor
+		/// </summary>
+		public Form1()
         {
             InitializeComponent(); // Initialised the application
             RefreshCOMSelector(); // Get the discoverable COM ports on start-up
@@ -341,7 +349,10 @@ namespace ElementCOMGUI
             DisplayLaserReady();
 
             AutoTurnOn();
-        }
+
+			AutoTurnOffChecker();
+
+		}
 
         /// <summary>
         /// Updates the list of available COMs and displays the list on the main COM port selector
@@ -1306,11 +1317,56 @@ namespace ElementCOMGUI
             SetStatus("Diagnostics Temp", status);
         }
 
-        #endregion
+		#endregion
 
-        #endregion
+		#endregion
 
-        #region AUTO_TURN_ON_FUNCTIONS
+		#region AUTO_TURN_OFF_FUNCTIONS
+
+		private void AutoTurnOffChecker()
+		{
+			// Check if the turn off flag is set high
+			if (AutoTurnOffFlag)
+			{
+				// Get the current time and date strings
+				var curTimeStr = DateTime.Now.ToShortTimeString();
+				var curDateStr = DateTime.Now.ToShortDateString();
+
+				// Get the auto turn on date and time
+				var autoTurnOnTime = AutoTurnOnTimePicker.Value;
+				//var autoTurnOffTimeStr = autoTurnOnTime.AddMinutes((double)AutoTurnOffWaitNumericUpDown.Value).ToShortTimeString();
+				var autoTurnOffTimeStr = autoTurnOnTime.AddHours((double)AutoTurnOffWaitNumericUpDown.Value).ToShortTimeString();
+				var autoTurnOffDateStr = AutoTurnOnDatePicker.Value.ToShortDateString();
+
+				// Check if the current DateTime is the same as the the turn off DateTime
+				if (curDateStr == autoTurnOffDateStr && curTimeStr == autoTurnOffTimeStr)
+				{
+					// Check if the main com port is open
+					if (!MainCOMPort.IsOpen)
+					{
+						// Display an error message
+						SetErrorLabelMessage("Main COM port not connected");
+						return;
+					}
+
+					// Reset the turn off flag
+					AutoTurnOffFlag = false;
+
+					// Send a turn off command
+					MainCOMPort.Write("STOPLSR=1\r");
+
+					// Log that an auto turn off request has been sent
+					LogEvent("Auto turn off request sent (Auto turn on timed out)");
+
+					// Display a message stating the laser was automatically turned off
+					MessageBox.Show("The Element was automatically turned off at " + curTimeStr + " " + curDateStr + "\n(Auto turn on timed out)", "Auto Turn-Off Occurred", MessageBoxButtons.OK, MessageBoxIcon.Stop);
+				}
+			}
+		}
+
+		#endregion
+
+		#region AUTO_TURN_ON_FUNCTIONS
 
 		/// <summary>
 		/// Function called when the value of the auto turn on picker changes
@@ -1318,7 +1374,7 @@ namespace ElementCOMGUI
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="e"></param>
-        private void AutoTurnOnTimePicker_ValueChanged(object sender, EventArgs e)
+		private void AutoTurnOnTimePicker_ValueChanged(object sender, EventArgs e)
         {
             //MessageBox.Show(AutoTurnOnTimePicker.Value.TimeOfDay.ToString());
             //AutoTurnOnTimePicker.Value.Second = 0;
@@ -1360,8 +1416,9 @@ namespace ElementCOMGUI
 					// Disable user control to the time and date pickers (done to prevent accidently changing the auto turn on time after it is set)
                     AutoTurnOnTimePicker.Enabled = false;
 					AutoTurnOnDatePicker.Enabled = false;
+					AutoTurnOffWaitNumericUpDown.Enabled = false;
 					// Show a pop up box stating the auto turn on time
-                    MessageBox.Show("The Element will automatically be turned on at " + AutoTurnOnTimePicker.Value.ToShortTimeString() + " " + AutoTurnOnDatePicker.Value.ToShortDateString());
+					MessageBox.Show("The Element will automatically be turned on at " + AutoTurnOnTimePicker.Value.ToShortTimeString() + " " + AutoTurnOnDatePicker.Value.ToShortDateString(), "Auto Turn-On Enabled", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
 				// Box is unchecked
                 else
@@ -1371,8 +1428,9 @@ namespace ElementCOMGUI
 					// Allow for the user to change the auto turn on time and date using the pickers
                     AutoTurnOnTimePicker.Enabled = true;
 					AutoTurnOnDatePicker.Enabled = true;
+					AutoTurnOffWaitNumericUpDown.Enabled = true;
 					// Show a pop up box stating that ther auto turn on has been unset
-					MessageBox.Show("The Element will not automatically be turned on");
+					MessageBox.Show("The Element will not automatically be turned on", "Auto Turn-On Disabled", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 }
             }
 			// If the code reaches here, the program has automatically change the check box state
@@ -1410,6 +1468,7 @@ namespace ElementCOMGUI
                 {
                     AutoTurnOnTimePicker.Enabled = true;
 					AutoTurnOnDatePicker.Enabled = true;
+					AutoTurnOffWaitNumericUpDown.Enabled = true;
                     return true;
                 }
             }
@@ -1456,12 +1515,22 @@ namespace ElementCOMGUI
 					// Disable the auto turn on check box
                     AutoTurnOnCheckBox.Checked = false;
 
+					// Set the laser turn off flag to high
+					AutoTurnOffFlag = true;
+
 					// Log that an auto turn on request has been sent
-                    LogEvent("Auto turn on request sent");
+					LogEvent("Auto turn on request sent");
 
 					// Display a text box stating that the element has been automatically turned on
-                    MessageBox.Show("The Element was automatically turned on at " + DateTime.Now.ToShortTimeString());
-                }
+					//MessageBox.Show("The Element was automatically turned on at " + DateTime.Now.ToShortTimeString());
+					var result = MessageBox.Show("The Element was automatically turned on at " + DateTime.Now.ToShortTimeString() + "\nPress 'OK' to prevent auto turn off before " + DateTime.Now.AddHours((double)AutoTurnOffWaitNumericUpDown.Value).ToShortTimeString(), "Auto Turn-On Success", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+
+					if (result == DialogResult.OK)
+					{
+						AutoTurnOffFlag = false;
+					}
+
+				}
 				// There is no COM connection to the laser
                 else
                 {

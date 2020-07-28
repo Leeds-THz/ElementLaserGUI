@@ -46,6 +46,7 @@
 			this.LogFileCOMPortConnectionStatusLabel = new System.Windows.Forms.Label();
 			this.LogAutoConnectButton = new System.Windows.Forms.Button();
 			this.MainCOMGroupBox = new System.Windows.Forms.GroupBox();
+			this.AutoTurnOnDatePicker = new System.Windows.Forms.DateTimePicker();
 			this.AutoTurnOnCheckBox = new System.Windows.Forms.CheckBox();
 			this.AutoTurnOnTimePicker = new System.Windows.Forms.DateTimePicker();
 			this.MainDisconnectButton = new System.Windows.Forms.Button();
@@ -71,7 +72,8 @@
 			this.EventLog = new System.Windows.Forms.DataGridView();
 			this.Time = new System.Windows.Forms.DataGridViewTextBoxColumn();
 			this.Event = new System.Windows.Forms.DataGridViewTextBoxColumn();
-			this.AutoTurnOnDatePicker = new System.Windows.Forms.DateTimePicker();
+			this.AutoTurnOffWaitNumericUpDown = new System.Windows.Forms.NumericUpDown();
+			this.label1 = new System.Windows.Forms.Label();
 			this.LogFileCOMGroupBox.SuspendLayout();
 			this.MainCOMGroupBox.SuspendLayout();
 			this.tabControl1.SuspendLayout();
@@ -80,6 +82,7 @@
 			this.MainCOMOutputTab.SuspendLayout();
 			this.EventLogTab.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.EventLog)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.AutoTurnOffWaitNumericUpDown)).BeginInit();
 			this.SuspendLayout();
 			// 
 			// MainCOMPortSelector
@@ -106,7 +109,7 @@
 			// 
 			// CommandButton
 			// 
-			this.CommandButton.Location = new System.Drawing.Point(137, 128);
+			this.CommandButton.Location = new System.Drawing.Point(137, 108);
 			this.CommandButton.Name = "CommandButton";
 			this.CommandButton.Size = new System.Drawing.Size(97, 20);
 			this.CommandButton.TabIndex = 4;
@@ -145,7 +148,7 @@
             "STOPLSR=1",
             "GETLOG=?",
             "RESETLOG=1"});
-			this.CommandComboBox.Location = new System.Drawing.Point(10, 127);
+			this.CommandComboBox.Location = new System.Drawing.Point(10, 108);
 			this.CommandComboBox.Name = "CommandComboBox";
 			this.CommandComboBox.Size = new System.Drawing.Size(121, 21);
 			this.CommandComboBox.TabIndex = 7;
@@ -235,6 +238,8 @@
 			// 
 			// MainCOMGroupBox
 			// 
+			this.MainCOMGroupBox.Controls.Add(this.label1);
+			this.MainCOMGroupBox.Controls.Add(this.AutoTurnOffWaitNumericUpDown);
 			this.MainCOMGroupBox.Controls.Add(this.AutoTurnOnDatePicker);
 			this.MainCOMGroupBox.Controls.Add(this.AutoTurnOnCheckBox);
 			this.MainCOMGroupBox.Controls.Add(this.AutoTurnOnTimePicker);
@@ -253,10 +258,19 @@
 			this.MainCOMGroupBox.TabStop = false;
 			this.MainCOMGroupBox.Text = "Main COM Port Panel";
 			// 
+			// AutoTurnOnDatePicker
+			// 
+			this.AutoTurnOnDatePicker.CustomFormat = "ddd d/MM";
+			this.AutoTurnOnDatePicker.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
+			this.AutoTurnOnDatePicker.Location = new System.Drawing.Point(206, 142);
+			this.AutoTurnOnDatePicker.Name = "AutoTurnOnDatePicker";
+			this.AutoTurnOnDatePicker.Size = new System.Drawing.Size(99, 20);
+			this.AutoTurnOnDatePicker.TabIndex = 15;
+			// 
 			// AutoTurnOnCheckBox
 			// 
 			this.AutoTurnOnCheckBox.AutoSize = true;
-			this.AutoTurnOnCheckBox.Location = new System.Drawing.Point(8, 168);
+			this.AutoTurnOnCheckBox.Location = new System.Drawing.Point(10, 143);
 			this.AutoTurnOnCheckBox.Name = "AutoTurnOnCheckBox";
 			this.AutoTurnOnCheckBox.Size = new System.Drawing.Size(106, 17);
 			this.AutoTurnOnCheckBox.TabIndex = 14;
@@ -268,7 +282,7 @@
 			// 
 			this.AutoTurnOnTimePicker.CustomFormat = "hh:mm tt";
 			this.AutoTurnOnTimePicker.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
-			this.AutoTurnOnTimePicker.Location = new System.Drawing.Point(120, 165);
+			this.AutoTurnOnTimePicker.Location = new System.Drawing.Point(122, 142);
 			this.AutoTurnOnTimePicker.Name = "AutoTurnOnTimePicker";
 			this.AutoTurnOnTimePicker.ShowUpDown = true;
 			this.AutoTurnOnTimePicker.Size = new System.Drawing.Size(80, 20);
@@ -480,14 +494,36 @@
 			this.Event.Name = "Event";
 			this.Event.ReadOnly = true;
 			// 
-			// AutoTurnOnDatePicker
+			// AutoTurnOffWaitNumericUpDown
 			// 
-			this.AutoTurnOnDatePicker.CustomFormat = "ddd d/MM";
-			this.AutoTurnOnDatePicker.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
-			this.AutoTurnOnDatePicker.Location = new System.Drawing.Point(206, 165);
-			this.AutoTurnOnDatePicker.Name = "AutoTurnOnDatePicker";
-			this.AutoTurnOnDatePicker.Size = new System.Drawing.Size(99, 20);
-			this.AutoTurnOnDatePicker.TabIndex = 15;
+			this.AutoTurnOffWaitNumericUpDown.Location = new System.Drawing.Point(249, 173);
+			this.AutoTurnOffWaitNumericUpDown.Maximum = new decimal(new int[] {
+            12,
+            0,
+            0,
+            0});
+			this.AutoTurnOffWaitNumericUpDown.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+			this.AutoTurnOffWaitNumericUpDown.Name = "AutoTurnOffWaitNumericUpDown";
+			this.AutoTurnOffWaitNumericUpDown.Size = new System.Drawing.Size(56, 20);
+			this.AutoTurnOffWaitNumericUpDown.TabIndex = 16;
+			this.AutoTurnOffWaitNumericUpDown.Value = new decimal(new int[] {
+            4,
+            0,
+            0,
+            0});
+			// 
+			// label1
+			// 
+			this.label1.AutoSize = true;
+			this.label1.Location = new System.Drawing.Point(110, 175);
+			this.label1.Name = "label1";
+			this.label1.Size = new System.Drawing.Size(133, 13);
+			this.label1.TabIndex = 17;
+			this.label1.Text = "Auto Turn Off Wait (Hours)";
 			// 
 			// Form1
 			// 
@@ -502,7 +538,7 @@
 			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
 			this.MaximizeBox = false;
 			this.Name = "Form1";
-			this.Text = "Element COM GUI Ver 4.4.5";
+			this.Text = "Element GUI Ver 4.4.5";
 			this.LogFileCOMGroupBox.ResumeLayout(false);
 			this.LogFileCOMGroupBox.PerformLayout();
 			this.MainCOMGroupBox.ResumeLayout(false);
@@ -515,6 +551,7 @@
 			this.MainCOMOutputTab.PerformLayout();
 			this.EventLogTab.ResumeLayout(false);
 			((System.ComponentModel.ISupportInitialize)(this.EventLog)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.AutoTurnOffWaitNumericUpDown)).EndInit();
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -565,6 +602,8 @@
         private System.Windows.Forms.Button OpenEventLogFolderButton;
         private System.Windows.Forms.Button EventLogClearButton;
 		private System.Windows.Forms.DateTimePicker AutoTurnOnDatePicker;
+		private System.Windows.Forms.Label label1;
+		private System.Windows.Forms.NumericUpDown AutoTurnOffWaitNumericUpDown;
 	}
 }
 
