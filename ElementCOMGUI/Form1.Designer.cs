@@ -46,6 +46,8 @@
 			this.LogFileCOMPortConnectionStatusLabel = new System.Windows.Forms.Label();
 			this.LogAutoConnectButton = new System.Windows.Forms.Button();
 			this.MainCOMGroupBox = new System.Windows.Forms.GroupBox();
+			this.label1 = new System.Windows.Forms.Label();
+			this.AutoTurnOffWaitNumericUpDown = new System.Windows.Forms.NumericUpDown();
 			this.AutoTurnOnDatePicker = new System.Windows.Forms.DateTimePicker();
 			this.AutoTurnOnCheckBox = new System.Windows.Forms.CheckBox();
 			this.AutoTurnOnTimePicker = new System.Windows.Forms.DateTimePicker();
@@ -72,17 +74,15 @@
 			this.EventLog = new System.Windows.Forms.DataGridView();
 			this.Time = new System.Windows.Forms.DataGridViewTextBoxColumn();
 			this.Event = new System.Windows.Forms.DataGridViewTextBoxColumn();
-			this.AutoTurnOffWaitNumericUpDown = new System.Windows.Forms.NumericUpDown();
-			this.label1 = new System.Windows.Forms.Label();
 			this.LogFileCOMGroupBox.SuspendLayout();
 			this.MainCOMGroupBox.SuspendLayout();
+			((System.ComponentModel.ISupportInitialize)(this.AutoTurnOffWaitNumericUpDown)).BeginInit();
 			this.tabControl1.SuspendLayout();
 			this.StatusTab.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.StatusDisplay)).BeginInit();
 			this.MainCOMOutputTab.SuspendLayout();
 			this.EventLogTab.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.EventLog)).BeginInit();
-			((System.ComponentModel.ISupportInitialize)(this.AutoTurnOffWaitNumericUpDown)).BeginInit();
 			this.SuspendLayout();
 			// 
 			// MainCOMPortSelector
@@ -257,6 +257,37 @@
 			this.MainCOMGroupBox.TabIndex = 10;
 			this.MainCOMGroupBox.TabStop = false;
 			this.MainCOMGroupBox.Text = "Main COM Port Panel";
+			// 
+			// label1
+			// 
+			this.label1.AutoSize = true;
+			this.label1.Location = new System.Drawing.Point(110, 175);
+			this.label1.Name = "label1";
+			this.label1.Size = new System.Drawing.Size(133, 13);
+			this.label1.TabIndex = 17;
+			this.label1.Text = "Auto Turn Off Wait (Hours)";
+			// 
+			// AutoTurnOffWaitNumericUpDown
+			// 
+			this.AutoTurnOffWaitNumericUpDown.Location = new System.Drawing.Point(249, 173);
+			this.AutoTurnOffWaitNumericUpDown.Maximum = new decimal(new int[] {
+            12,
+            0,
+            0,
+            0});
+			this.AutoTurnOffWaitNumericUpDown.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+			this.AutoTurnOffWaitNumericUpDown.Name = "AutoTurnOffWaitNumericUpDown";
+			this.AutoTurnOffWaitNumericUpDown.Size = new System.Drawing.Size(56, 20);
+			this.AutoTurnOffWaitNumericUpDown.TabIndex = 16;
+			this.AutoTurnOffWaitNumericUpDown.Value = new decimal(new int[] {
+            4,
+            0,
+            0,
+            0});
 			// 
 			// AutoTurnOnDatePicker
 			// 
@@ -494,37 +525,6 @@
 			this.Event.Name = "Event";
 			this.Event.ReadOnly = true;
 			// 
-			// AutoTurnOffWaitNumericUpDown
-			// 
-			this.AutoTurnOffWaitNumericUpDown.Location = new System.Drawing.Point(249, 173);
-			this.AutoTurnOffWaitNumericUpDown.Maximum = new decimal(new int[] {
-            12,
-            0,
-            0,
-            0});
-			this.AutoTurnOffWaitNumericUpDown.Minimum = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-			this.AutoTurnOffWaitNumericUpDown.Name = "AutoTurnOffWaitNumericUpDown";
-			this.AutoTurnOffWaitNumericUpDown.Size = new System.Drawing.Size(56, 20);
-			this.AutoTurnOffWaitNumericUpDown.TabIndex = 16;
-			this.AutoTurnOffWaitNumericUpDown.Value = new decimal(new int[] {
-            4,
-            0,
-            0,
-            0});
-			// 
-			// label1
-			// 
-			this.label1.AutoSize = true;
-			this.label1.Location = new System.Drawing.Point(110, 175);
-			this.label1.Name = "label1";
-			this.label1.Size = new System.Drawing.Size(133, 13);
-			this.label1.TabIndex = 17;
-			this.label1.Text = "Auto Turn Off Wait (Hours)";
-			// 
 			// Form1
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -538,11 +538,12 @@
 			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
 			this.MaximizeBox = false;
 			this.Name = "Form1";
-			this.Text = "Element GUI Ver 4.4.5";
+			this.Text = "Element GUI Ver 5.0.0";
 			this.LogFileCOMGroupBox.ResumeLayout(false);
 			this.LogFileCOMGroupBox.PerformLayout();
 			this.MainCOMGroupBox.ResumeLayout(false);
 			this.MainCOMGroupBox.PerformLayout();
+			((System.ComponentModel.ISupportInitialize)(this.AutoTurnOffWaitNumericUpDown)).EndInit();
 			this.tabControl1.ResumeLayout(false);
 			this.StatusTab.ResumeLayout(false);
 			this.StatusTab.PerformLayout();
@@ -551,7 +552,6 @@
 			this.MainCOMOutputTab.PerformLayout();
 			this.EventLogTab.ResumeLayout(false);
 			((System.ComponentModel.ISupportInitialize)(this.EventLog)).EndInit();
-			((System.ComponentModel.ISupportInitialize)(this.AutoTurnOffWaitNumericUpDown)).EndInit();
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
