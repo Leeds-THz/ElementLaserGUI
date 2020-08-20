@@ -68,16 +68,47 @@ namespace ElementLaserGUI
         {
             InitializeComponent(); // Initialised the application
             RefreshCOMSelector(); // Get the discoverable COM ports on start-up
-        }
+			StatusDataGridInit(); // Inits the field shown in the status data grid
+		}
 
-        #endregion
+		#endregion
 
-        #region COM_CONNECTION_FUNCTIONS
+		#region STATUS_DATAGRID_INIT_FUNCTIONS
 
-        /// <summary>
-        /// Retrieves the discoverable COM ports, storing the names to 'COMList'
-        /// </summary>
-        private void RefreshCOM()
+		/// <summary>
+		/// Sets the intial values of each row in the status data grid
+		/// NOTE: In previous versions this code was in 'Form1.Designer.cs' in auto-generated code, but it kept getting deleted.
+		/// </summary>
+		void StatusDataGridInit()
+		{
+			///
+			/// Status rows
+			/// 
+			StatusDisplay.Rows.Add("Warming Up");
+			StatusDisplay.Rows.Add("Shutter");
+			StatusDisplay.Rows.Add("Power");
+			StatusDisplay.Rows.Add("Center WL");
+			StatusDisplay.Rows.Add("FWHM");
+			StatusDisplay.Rows.Add("User Interface Temp");
+			StatusDisplay.Rows.Add("Cavity Temp");
+			StatusDisplay.Rows.Add("Pump Laser Temp");
+			StatusDisplay.Rows.Add("Diagnostics Temp");
+			StatusDisplay.Rows.Add("4QD (532 nm) SUM");
+			StatusDisplay.Rows.Add("4QD (532 nm) X");
+			StatusDisplay.Rows.Add("4QD (532 nm) Y");
+			StatusDisplay.Rows.Add("4QD (800 nm) SUM");
+			StatusDisplay.Rows.Add("4QD (800 nm) X");
+			StatusDisplay.Rows.Add("4QD (800 nm) Y");
+		}
+
+		#endregion
+
+		#region COM_CONNECTION_FUNCTIONS
+
+		/// <summary>
+		/// Retrieves the discoverable COM ports, storing the names to 'COMList'
+		/// </summary>
+		private void RefreshCOM()
         {
             COMList = SerialPort.GetPortNames(); // Acquire string array of the names of all discoverable COM ports
 
