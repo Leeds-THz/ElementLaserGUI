@@ -879,9 +879,20 @@ namespace ElementLaserGUI
         {
             // If |Power diff| < 10 and |CWL| < 10 and |FWHM| < 10 and Warm Up == NO
             var warmUpString = GetStatusCell("Warming Up", 1);
-            var powerDiffString = GetStatusCell("Power", 3);
-            var CWLDiffString = GetStatusCell("Center WL", 3);
+            //var powerDiffString = GetStatusCell("Power", 3);
+			//var powerString = GetStatusCell("Power", 1);
+			var CWLDiffString = GetStatusCell("Center WL", 3);
             var FWHMDiffString = GetStatusCell("FWHM", 3);
+
+			int powerVal = 0;
+
+			try
+			{
+				powerVal = Int32.Parse(GetStatusCell("Power", 1));
+			}
+			catch (Exception)
+			{
+			}
 
 			/*
             if (warmUpString == "NO" && StringAbsValueInLimits(powerDiffString, 10) && StringAbsValueInLimits(CWLDiffString, 10) && StringAbsValueInLimits(FWHMDiffString, 10))
@@ -892,7 +903,7 @@ namespace ElementLaserGUI
             return false;
 			*/
 
-			return (warmUpString == "NO" && StringAbsValueInLimits(powerDiffString, 10) && StringAbsValueInLimits(CWLDiffString, 10) && StringAbsValueInLimits(FWHMDiffString, 10));
+			return (warmUpString == "NO" && powerVal >= LaserReadyPowerThreshNumUpDown.Value && StringAbsValueInLimits(CWLDiffString, 10) && StringAbsValueInLimits(FWHMDiffString, 10));
         }
 
 		/// <summary>

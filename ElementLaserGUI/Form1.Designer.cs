@@ -74,6 +74,10 @@
 			this.EventLog = new System.Windows.Forms.DataGridView();
 			this.Time = new System.Windows.Forms.DataGridViewTextBoxColumn();
 			this.Event = new System.Windows.Forms.DataGridViewTextBoxColumn();
+			this.tabPage1 = new System.Windows.Forms.TabPage();
+			this.LaserReadyPowerThreshNumUpDown = new System.Windows.Forms.NumericUpDown();
+			this.LaserReadyPowerThreshUnitLabel = new System.Windows.Forms.Label();
+			this.LaserReadyPowerThreshLabel = new System.Windows.Forms.Label();
 			this.LogFileCOMGroupBox.SuspendLayout();
 			this.MainCOMGroupBox.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.AutoTurnOffWaitNumericUpDown)).BeginInit();
@@ -83,6 +87,8 @@
 			this.MainCOMOutputTab.SuspendLayout();
 			this.EventLogTab.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.EventLog)).BeginInit();
+			this.tabPage1.SuspendLayout();
+			((System.ComponentModel.ISupportInitialize)(this.LaserReadyPowerThreshNumUpDown)).BeginInit();
 			this.SuspendLayout();
 			// 
 			// MainCOMPortSelector
@@ -377,6 +383,7 @@
 			this.tabControl1.Controls.Add(this.StatusTab);
 			this.tabControl1.Controls.Add(this.MainCOMOutputTab);
 			this.tabControl1.Controls.Add(this.EventLogTab);
+			this.tabControl1.Controls.Add(this.tabPage1);
 			this.tabControl1.Location = new System.Drawing.Point(12, 222);
 			this.tabControl1.Name = "tabControl1";
 			this.tabControl1.SelectedIndex = 0;
@@ -525,6 +532,53 @@
 			this.Event.Name = "Event";
 			this.Event.ReadOnly = true;
 			// 
+			// tabPage1
+			// 
+			this.tabPage1.Controls.Add(this.LaserReadyPowerThreshLabel);
+			this.tabPage1.Controls.Add(this.LaserReadyPowerThreshUnitLabel);
+			this.tabPage1.Controls.Add(this.LaserReadyPowerThreshNumUpDown);
+			this.tabPage1.Location = new System.Drawing.Point(4, 22);
+			this.tabPage1.Name = "tabPage1";
+			this.tabPage1.Size = new System.Drawing.Size(456, 248);
+			this.tabPage1.TabIndex = 3;
+			this.tabPage1.Text = "Laser Ready Settings";
+			this.tabPage1.UseVisualStyleBackColor = true;
+			// 
+			// LaserReadyPowerThreshNumUpDown
+			// 
+			this.LaserReadyPowerThreshNumUpDown.Location = new System.Drawing.Point(162, 13);
+			this.LaserReadyPowerThreshNumUpDown.Maximum = new decimal(new int[] {
+            2000,
+            0,
+            0,
+            0});
+			this.LaserReadyPowerThreshNumUpDown.Name = "LaserReadyPowerThreshNumUpDown";
+			this.LaserReadyPowerThreshNumUpDown.Size = new System.Drawing.Size(57, 20);
+			this.LaserReadyPowerThreshNumUpDown.TabIndex = 0;
+			this.LaserReadyPowerThreshNumUpDown.Value = new decimal(new int[] {
+            720,
+            0,
+            0,
+            0});
+			// 
+			// LaserReadyPowerThreshUnitLabel
+			// 
+			this.LaserReadyPowerThreshUnitLabel.AutoSize = true;
+			this.LaserReadyPowerThreshUnitLabel.Location = new System.Drawing.Point(225, 15);
+			this.LaserReadyPowerThreshUnitLabel.Name = "LaserReadyPowerThreshUnitLabel";
+			this.LaserReadyPowerThreshUnitLabel.Size = new System.Drawing.Size(26, 13);
+			this.LaserReadyPowerThreshUnitLabel.TabIndex = 1;
+			this.LaserReadyPowerThreshUnitLabel.Text = "mW";
+			// 
+			// LaserReadyPowerThreshLabel
+			// 
+			this.LaserReadyPowerThreshLabel.AutoSize = true;
+			this.LaserReadyPowerThreshLabel.Location = new System.Drawing.Point(3, 15);
+			this.LaserReadyPowerThreshLabel.Name = "LaserReadyPowerThreshLabel";
+			this.LaserReadyPowerThreshLabel.Size = new System.Drawing.Size(153, 13);
+			this.LaserReadyPowerThreshLabel.TabIndex = 2;
+			this.LaserReadyPowerThreshLabel.Text = "Laser Ready Power Threshold:";
+			// 
 			// Form1
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -552,6 +606,9 @@
 			this.MainCOMOutputTab.PerformLayout();
 			this.EventLogTab.ResumeLayout(false);
 			((System.ComponentModel.ISupportInitialize)(this.EventLog)).EndInit();
+			this.tabPage1.ResumeLayout(false);
+			this.tabPage1.PerformLayout();
+			((System.ComponentModel.ISupportInitialize)(this.LaserReadyPowerThreshNumUpDown)).EndInit();
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -604,6 +661,10 @@
 		private System.Windows.Forms.DateTimePicker AutoTurnOnDatePicker;
 		private System.Windows.Forms.Label label1;
 		private System.Windows.Forms.NumericUpDown AutoTurnOffWaitNumericUpDown;
+		private System.Windows.Forms.TabPage tabPage1;
+		private System.Windows.Forms.Label LaserReadyPowerThreshLabel;
+		private System.Windows.Forms.Label LaserReadyPowerThreshUnitLabel;
+		private System.Windows.Forms.NumericUpDown LaserReadyPowerThreshNumUpDown;
 	}
 }
 
