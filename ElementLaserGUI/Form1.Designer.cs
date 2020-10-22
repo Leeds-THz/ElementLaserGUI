@@ -592,7 +592,7 @@
 			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
 			this.MaximizeBox = false;
 			this.Name = "Form1";
-			this.Text = "Element GUI Ver 5.0.1";
+			this.Text = "Element GUI Ver 5.1.0";
 			this.LogFileCOMGroupBox.ResumeLayout(false);
 			this.LogFileCOMGroupBox.PerformLayout();
 			this.MainCOMGroupBox.ResumeLayout(false);
