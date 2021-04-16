@@ -1452,8 +1452,24 @@ namespace ElementLaserGUI
                         AutoTurnOnCheckBox.Checked = false;
                         return;
                     }
-                    
-					// Log the auto turn on being set as an event
+
+                    // Check if the time seleced is in the past
+                    // Construct DateTime object for the auto turn on time
+                    string autoTurnOnTimeString = AutoTurnOnTimePicker.Value.ToShortTimeString() + " " + AutoTurnOnDatePicker.Value.ToShortDateString();
+                    DateTime autoTurnOnDateTime = DateTime.Parse(autoTurnOnTimeString);
+
+                    if (DateTime.Now.CompareTo(autoTurnOnDateTime) > 0)
+                    {
+                        // Display an error message
+                        SetErrorLabelMessage("Cannot select an auto-turn on time in the past");
+                        // Disable auto turn on pop up
+                        supressAutoTurnOnCheckBoxMessage = true;
+                        // Disable the check box
+                        AutoTurnOnCheckBox.Checked = false;
+                        return;
+                    }
+
+                    // Log the auto turn on being set as an event
                     LogEvent("Element set to turn on at " + AutoTurnOnTimePicker.Value.ToShortTimeString() + " " + AutoTurnOnDatePicker.Value.ToShortDateString());
 					// Disable user control to the time and date pickers (done to prevent accidently changing the auto turn on time after it is set)
                     AutoTurnOnTimePicker.Enabled = false;
